@@ -3,6 +3,8 @@ import os
 import numpy as np
 import wget
 import sys
+import json
+import copy
 from torch import nn
 sys.path.append('../')
 from utils.statistics import Statistics
@@ -85,26 +87,32 @@ class Model(nn.Module):
             torch.save(self, os.path.join(self.cf.exp_folder, self.cf.model_name + '.pth'))
 
     def save(self, stats):
+        save = False
         if self.cf.save_condition == 'always':
-            self.save_model()
+            save = True
         elif self.cf.save_condition == 'train_loss':
             if stats.train.loss < self.best_stats.train.loss:
-                self.best_stats.train.loss = stats.train.loss
-                self.save_model()
+                save = True
         elif self.cf.save_condition == 'valid_loss':
             if stats.val.loss < self.best_stats.val.loss:
-                self.best_stats.val.loss = stats.val.loss
-                self.save_model()
+                save = True
         elif self.cf.save_condition == 'valid_mIoU':
             if stats.val.mIoU > self.best_stats.val.mIoU:
-                self.best_stats.val.mIoU = stats.val.mIoU
-                self.save_model()
+                save = True
         elif self.cf.save_condition == 'valid_mAcc':
             if stats.val.acc > self.best_stats.val.acc:
-                self.best_stats.val.acc = stats.val.acc
-                self.save_model()
+                save = True
+        if save:
+            self.save_model()
+            self.best_stats = copy.deepcopy(stats)
+        return save
 
     def restore_model(self):
         print('\t Restoring weight from ' + self.cf.input_model_path + self.cf.model_name)
         net = torch.load(os.path.join(self.cf.input_model_path, self.cf.model_name + '.pth'))
         return net
+
+    def load_statistics(self):
+        if os.path.exists(self.cf.best_json_file):
+            with open(self.cf.best_json_file) as json_file:
+                json_data = json.load(json_file)
