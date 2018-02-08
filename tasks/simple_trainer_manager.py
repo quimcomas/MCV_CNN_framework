@@ -112,7 +112,7 @@ class SimpleTrainer(object):
                 self.stats.train.conf_m = confm_list
                 self.compute_stats(np.asarray(confm_list),train_loss)
                 self.save_stats_epoch(epoch)
-                self.logger_stats.train_json.write(self.stats.train, epoch)
+                #self.logger_stats.train_json.write(self.stats.train, epoch)
 
                 # Validate epoch
                 self.validate_epoch(valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar)
@@ -125,8 +125,7 @@ class SimpleTrainer(object):
                 save = self.model.net.save(self.stats)
                 if save:
                     self.logger_stats.best_json.override_file()
-                    self.logger_stats.best_json.write(self.stats.train, epoch)
-                    self.logger_stats.best_json.write(self.stats.val, epoch)
+                    self.logger_stats.best_json.write(self.stats, epoch)
 
                 # Update display values
                 self.update_messages(epoch, epoch_time)
@@ -256,12 +255,12 @@ class SimpleTrainer(object):
 
             # Save stats
             self.save_stats(epoch)
-            if mode == 'val_epoch':
+            '''if mode == 'val_epoch':
                 self.logger_stats.val_train_json.write(self.stats.val, epoch)
             elif mode == 'val':
                 self.logger_stats.val_json.write(self.stats.val, epoch)
             elif mode == 'test':
-                self.logger_stats.test_json.write(self.stats.test, epoch)
+                self.logger_stats.test_json.write(self.stats.test, epoch)'''
 
         def update_msg(self, bar, global_bar):
             if global_bar==None:

@@ -57,9 +57,7 @@ class Model(nn.Module):
     def download_if_not_exist(self, filename):
         # Download the file if it does not exist
         if not os.path.isfile(filename) and self.url is not None:
-            #urllib.urlretrieve(self.url, filename)
             wget.download(self.url, filename)
-            #self.download_google_drive2(self.url, filename)
 
     def restore_weights(self, filename):
         print('\t Restoring weight from ' + filename)
@@ -116,3 +114,20 @@ class Model(nn.Module):
         if os.path.exists(self.cf.best_json_file):
             with open(self.cf.best_json_file) as json_file:
                 json_data = json.load(json_file)
+                self.best_stats.train = self.fill_statistics(json_data[0],self.best_stats.train)
+                self.best_stats.val = self.fill_statistics(json_data[1], self.best_stats.val)
+
+    def fill_statistics(self, dict_stats, stats):
+        stats.loss = dict_stats['loss']
+        stats.mIoU = dict_stats['mIoU']
+        stats.acc = dict_stats['acc']
+        stats.precision = dict_stats['precision']
+        stats.recall = dict_stats['recall']
+        stats.f1score = dict_stats['f1score']
+        stats.conf_m = dict_stats['conf_m']
+        stats.mIoU_perclass = dict_stats['mIoU_perclass']
+        stats.acc_perclass = dict_stats['acc_perclass']
+        stats.precision_perclass = dict_stats['precision_perclass']
+        stats.recall_perclass = dict_stats['recall_perclass']
+        stats.f1score_perclass = dict_stats['f1score_perclass']
+        return stats

@@ -31,7 +31,7 @@ class Model_builder():
 
         if self.cf.pretrained_model.lower() == 'custom' and self.cf.load_weight_only:
             self.net.restore_weights(os.path.join(self.cf.input_model_path))
-            #self.net.load_statistics()
+            self.net.load_statistics()
 
         
 
