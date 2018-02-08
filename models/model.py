@@ -2,12 +2,19 @@ import torch
 import os
 import numpy as np
 import wget
+import sys
+import json
+import copy
 from torch import nn
+sys.path.append('../')
+from utils.statistics import Statistics
 
 class Model(nn.Module):
-    def __init__(self):
+    def __init__(self, cf):
         super(Model, self).__init__()
         self.url = None
+        self.cf = cf
+        self.best_stats = Statistics()
 
     def forward(self, x):
         pass
@@ -40,21 +47,23 @@ class Model(nn.Module):
         weight[range(in_channels), range(out_channels), :, :] = filt
         return torch.from_numpy(weight).float()
 
-    def load_basic_weights(self, basic_model_path, net_name):
-        if not os.path.exists(basic_model_path):
-            os.makedirs(basic_model_path)
-        filename = os.path.join(basic_model_path, 'basic_'+ net_name +'.pth')
+    def load_basic_weights(self, net_name):
+        if not os.path.exists(self.cf.basic_models_path):
+            os.makedirs(self.cf.basic_models_path)
+        filename = os.path.join(self.cf.basic_models_path, 'basic_'+ net_name +'.pth')
         self.download_if_not_exist(filename)
         self.restore_weights(filename)
 
     def download_if_not_exist(self, filename):
         # Download the file if it does not exist
         if not os.path.isfile(filename) and self.url is not None:
-            #urllib.urlretrieve(self.url, filename)
             wget.download(self.url, filename)
-            #self.download_google_drive2(self.url, filename)
 
     def restore_weights(self, filename):
+        print('\t Restoring weight from ' + filename)
+        self.load_state_dict(torch.load(os.path.join(filename)))
+
+    def restore_weights2(self, filename):
         print('\t Loading basic model weights from ' + filename)
 
         pretrained_dict = torch.load(filename)['model_state_dict']
@@ -67,3 +76,58 @@ class Model(nn.Module):
                 model_dict[k] = v
 
         self.load_state_dict(model_dict)
+
+    def save_model(self):
+        if self.cf.save_weight_only:
+            torch.save(self.state_dict(), os.path.join(self.cf.output_model_path,
+                self.cf.model_name + '.pth'))
+        else:
+            torch.save(self, os.path.join(self.cf.exp_folder, self.cf.model_name + '.pth'))
+
+    def save(self, stats):
+        save = False
+        if self.cf.save_condition == 'always':
+            save = True
+        elif self.cf.save_condition == 'train_loss':
+            if stats.train.loss < self.best_stats.train.loss:
+                save = True
+        elif self.cf.save_condition == 'valid_loss':
+            if stats.val.loss < self.best_stats.val.loss:
+                save = True
+        elif self.cf.save_condition == 'valid_mIoU':
+            if stats.val.mIoU > self.best_stats.val.mIoU:
+                save = True
+        elif self.cf.save_condition == 'valid_mAcc':
+            if stats.val.acc > self.best_stats.val.acc:
+                save = True
+        if save:
+            self.save_model()
+            self.best_stats = copy.deepcopy(stats)
+        return save
+
+    def restore_model(self):
+        print('\t Restoring weight from ' + self.cf.input_model_path + self.cf.model_name)
+        net = torch.load(os.path.join(self.cf.input_model_path, self.cf.model_name + '.pth'))
+        return net
+
+    def load_statistics(self):
+        if os.path.exists(self.cf.best_json_file):
+            with open(self.cf.best_json_file) as json_file:
+                json_data = json.load(json_file)
+                self.best_stats.train = self.fill_statistics(json_data[0],self.best_stats.train)
+                self.best_stats.val = self.fill_statistics(json_data[1], self.best_stats.val)
+
+    def fill_statistics(self, dict_stats, stats):
+        stats.loss = dict_stats['loss']
+        stats.mIoU = dict_stats['mIoU']
+        stats.acc = dict_stats['acc']
+        stats.precision = dict_stats['precision']
+        stats.recall = dict_stats['recall']
+        stats.f1score = dict_stats['f1score']
+        stats.conf_m = dict_stats['conf_m']
+        stats.mIoU_perclass = dict_stats['mIoU_perclass']
+        stats.acc_perclass = dict_stats['acc_perclass']
+        stats.precision_perclass = dict_stats['precision_perclass']
+        stats.recall_perclass = dict_stats['recall_perclass']
+        stats.f1score_perclass = dict_stats['f1score_perclass']
+        return stats

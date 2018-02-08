@@ -20,7 +20,14 @@ class Configuration():
         cf.log_file = os.path.join(cf.exp_folder, "logfile.log")
         cf.log_file_stats = os.path.join(cf.exp_folder, "logfile_stats.log")
         cf.log_file_debug = os.path.join(cf.exp_folder, "logfile_debug.log")
-        cf.json_file = os.path.join(cf.exp_folder, "stats.json")
+
+        if not os.path.exists(os.path.join(cf.exp_folder, 'json_stats/')):
+            os.makedirs(os.path.join(cf.exp_folder, 'json_stats/'))
+        cf.train_json_file = os.path.join(cf.exp_folder, "json_stats/train_stats.json")
+        cf.val_train_json_file = os.path.join(cf.exp_folder, "json_stats/val_train_stats.json")
+        cf.val_json_file = os.path.join(cf.exp_folder, "json_stats/val_stats.json")
+        cf.test_json_file = os.path.join(cf.exp_folder, "json_stats/test_stats.json")
+        cf.best_json_file = os.path.join(cf.exp_folder, "json_stats/best_model_stats.json")
         # Copy config file
         shutil.copyfile(cf.config_path, os.path.join(cf.exp_folder, "config.py"))
 
@@ -31,7 +38,7 @@ class Configuration():
         cf.original_size = cf.size_image_test
 
         if cf.input_model_path is None:
-            cf.input_model_path = cf.exp_folder + cf.model_name + '.pth'
+            cf.input_model_path = os.path.join(cf.exp_folder, cf.model_name + '.pth')
         if cf.output_model_path is None:
             cf.output_model_path = cf.exp_folder
         else:
@@ -48,4 +55,6 @@ class Configuration():
             cf.basic_pretrained_model = True
         else:
             cf.basic_pretrained_model = False
+        if cf.basic_models_path is None:
+            cf.basic_models_path = './pretrained_model/',
         return cf

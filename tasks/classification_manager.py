@@ -23,7 +23,7 @@ class Classification_Manager(SimpleTrainer):
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, epoch, global_bar=global_bar)
+                self.validator.start(criterion, valid_set, valid_loader, 'val_epoch', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -104,7 +104,6 @@ class Classification_Manager(SimpleTrainer):
                         epoch, self.stats.val.loss, 100 * self.stats.val.acc, 100 * self.stats.val.precision,
                         100 * self.stats.val.recall, 100 * self.stats.val.f1score))
                 self.logger_stats.write('---------------------------------------------------------------- \n')
-                self.logger_stats.save_json(self.stats.val, epoch)
 
                 # add scores to tensorboard
                 self.writer.add_scalar('losses/epoch', self.stats.val.loss, epoch)

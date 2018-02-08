@@ -21,7 +21,7 @@ class SimpleTrainer(object):
         self.cf = cf
         self.model = model
         self.logger_stats = Logger(cf.log_file_stats)
-        self.logger_stats.create_json(cf.json_file)
+        self.logger_stats.create_stats_json(self.cf)
         self.stats = Statistics()
         self.msg = Messages()
 
@@ -112,6 +112,7 @@ class SimpleTrainer(object):
                 self.stats.train.conf_m = confm_list
                 self.compute_stats(np.asarray(confm_list),train_loss)
                 self.save_stats_epoch(epoch)
+                #self.logger_stats.train_json.write(self.stats.train, epoch)
 
                 # Validate epoch
                 self.validate_epoch(valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar)
@@ -121,7 +122,10 @@ class SimpleTrainer(object):
                     scheduler.step(self.stats.val.loss)
 
                 # Saving model if needed
-                self.model.save(self.model.net, self.stats)
+                save = self.model.net.save(self.stats)
+                if save:
+                    self.logger_stats.best_json.override_file()
+                    self.logger_stats.best_json.write(self.stats, epoch)
 
                 # Update display values
                 self.update_messages(epoch, epoch_time)
@@ -157,7 +161,7 @@ class SimpleTrainer(object):
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, epoch, global_bar=global_bar)
+                self.validator.start(criterion, valid_set, valid_loader, 'val_epoch', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -210,7 +214,7 @@ class SimpleTrainer(object):
             self.msg = msg
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path, 'validation'))
 
-        def start(self, criterion, valid_set, valid_loader, epoch=None, global_bar=None):
+        def start(self, criterion, valid_set, valid_loader, mode='val', epoch=None, global_bar=None):
             confm_list = np.zeros((self.cf.num_classes,self.cf.num_classes))
 
             val_loss = AverageMeter()
@@ -251,6 +255,12 @@ class SimpleTrainer(object):
 
             # Save stats
             self.save_stats(epoch)
+            '''if mode == 'val_epoch':
+                self.logger_stats.val_train_json.write(self.stats.val, epoch)
+            elif mode == 'val':
+                self.logger_stats.val_json.write(self.stats.val, epoch)
+            elif mode == 'test':
+                self.logger_stats.test_json.write(self.stats.test, epoch)'''
 
         def update_msg(self, bar, global_bar):
             if global_bar==None:
@@ -280,6 +290,7 @@ class SimpleTrainer(object):
                 self.logger_stats.write('[val loss %.5f], [acc %.2f] \n' % (
                     self.stats.val.loss, 100 * self.stats.val.acc))
                 self.logger_stats.write('---------------------------------------------------------------- \n')
+
 
     class predict(object):
         def __init__(self, logger_stats, model, cf):
