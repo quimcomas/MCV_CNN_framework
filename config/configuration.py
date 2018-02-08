@@ -38,7 +38,8 @@ class Configuration():
             if not os.path.exists(cf.output_model_path):
                 os.makedirs(cf.output_model_path)
         if cf.map_labels is not None:
-            cf.map_labels = np.asarray(cf.map_labels,dtype=np.uint16)
+            cf.map_labels = {value:idx for idx,value in enumerate(cf.map_labels)}
+            # cf.map_labels = np.asarray(cf.map_labels,dtype=np.uint16)
         if cf.pretrained_model is None:
             cf.pretrained_model = 'None'
         if not cf.pretrained_model.lower() in ('none', 'basic', 'custom'):
