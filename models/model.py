@@ -63,19 +63,21 @@ class Model(nn.Module):
         print('\t Restoring weight from ' + filename)
         self.load_state_dict(torch.load(os.path.join(filename)))
 
-    def restore_weights2(self, filename):
-        print('\t Loading basic model weights from ' + filename)
-
-        pretrained_dict = torch.load(filename)['model_state_dict']
+    def load_state_dict(self, pretrained_dict):
         model_dict = self.state_dict()
 
         for k, v in pretrained_dict.items():
-            if v.size()!=model_dict[k].size():
-                print('\t WARNING: Could not load layer ' + str(k) + ' with shape: '+str(v.size())+ ' and '+str(model_dict[k].size()))
+            if v.size() != model_dict[k].size():
+                print('\t WARNING: Could not load layer ' + str(k) + ' with shape: ' + str(v.size()) + ' and ' + str(
+                    model_dict[k].size()))
             else:
                 model_dict[k] = v
 
-        self.load_state_dict(model_dict)
+        super(Model, self).load_state_dict(model_dict)
+
+    def restore_weights2(self, filename):
+        print('\t Restoring weight from ' + filename)
+        self.load_state_dict(torch.load(os.path.join(filename))['model_state_dict'])
 
     def save_model(self):
         if self.cf.save_weight_only:

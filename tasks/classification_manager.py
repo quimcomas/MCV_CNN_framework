@@ -61,8 +61,8 @@ class Classification_Manager(SimpleTrainer):
                     epoch, 100 * self.stats.val.acc, 100 * self.stats.val.precision, 100 * self.stats.val.recall, 100 * self.stats.val.f1score, self.stats.val.loss)
                 self.best_f1score = self.stats.val.f1score
 
-                msg_confm = self.stats.val.get_confm_str()
-                self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
+                # msg_confm = self.stats.val.get_confm_str()
+                # self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
 
         def save_stats_epoch(self, epoch):
             # Save logger
