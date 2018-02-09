@@ -11,6 +11,7 @@ from utils.ProgressBar import ProgressBar
 from utils.logger import Logger
 from utils.statistics import Statistics
 from utils.messages import Messages
+from utils.save_images import save_img
 from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm,compute_mIoU
 
 import os
@@ -252,6 +253,11 @@ class SimpleTrainer(object):
                 # Save epoch stats
                 self.stats.val.conf_m = confm_list
                 self.stats.val.loss = val_loss.avg / (w * h * c)
+
+                # Save predictions and generate overlaping
+                if self.cf.problem_type.lower() == 'segmentation':
+                    save_img(self.writer, inputs.cpu(), gts.cpu(), predictions, epoch, self.cf.color_map,
+                                                       self.cf.labels, self.cf.void_class, n_legend_rows=1)
 
                 # Update messages
                 self.update_msg(bar, global_bar)

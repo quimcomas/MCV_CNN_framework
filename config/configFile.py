@@ -98,3 +98,6 @@ std                         = [0.18696375, 0.19017339, 0.18720214]#[0.21090189, 
 
 # Data augmentation
 hflips                      = True
+
+# Tensorboard info
+color_map = None
