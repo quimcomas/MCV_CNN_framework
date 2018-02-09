@@ -4,7 +4,8 @@ import numpy as np
 import os
 
 sys.path.append('../')
-from metrics.metrics import compute_precision, compute_recall, compute_f1score, compute_accuracy, compute_confusion_matrix, extract_stats_from_confm
+from metrics.metrics import compute_precision, compute_recall, compute_f1score, compute_accuracy, \
+    compute_confusion_matrix, extract_stats_from_confm
 from simple_trainer_manager import SimpleTrainer
 from utils.tools import confm_metrics2image
 
@@ -15,15 +16,19 @@ class Classification_Manager(SimpleTrainer):
     class train(SimpleTrainer.train):
         def __init__(self, logger_stats, model, cf, validator, stats, msg):
             super(Classification_Manager.train, self).__init__(logger_stats, model, cf, validator, stats, msg)
-            self.best_f1score = -1
+            if self.cf.resume_experiment:
+                self.msg.msg_stats_best = 'Best case: epoch = %d, acc= %.2f, precision= %.2f, recall= %.2f, ' \
+                                          'f1score= %.2f, loss = %.5f\n' % (self.model.net.best_stats.epoch,
+                            100 * self.model.net.best_stats.val.acc, 100 * self.model.net.best_stats.val.precision,
+                            100 * self.model.net.best_stats.val.recall, 100 * self.model.net.best_stats.val.f1score,
+                            self.model.net.best_stats.val.loss)
 
         def validate_epoch(self, valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar):
-
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, 'val_epoch', epoch, global_bar=global_bar)
+                self.validator.start(criterion, valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -48,17 +53,21 @@ class Classification_Manager(SimpleTrainer):
             if train_loss is not None:
                 self.stats.train.loss = train_loss.avg
 
-        def update_messages(self, epoch, epoch_time):
+        def update_messages(self, epoch, epoch_time, new_best):
             # Update logger
             epoch_time = time.time() - epoch_time
             self.logger_stats.write('\t Epoch step finished: %ds \n' % (epoch_time))
 
             # Compute best stats
-            self.msg.msg_stats_last = '\nLast epoch: acc= %.2f, precision= %.2f, recall= %.2f, f1score= %.2f, loss = %.5f\n' % (
-                100 * self.stats.val.acc, 100 * self.stats.val.precision, 100 * self.stats.val.recall, 100 * self.stats.val.f1score, self.stats.val.loss)
-            if self.best_f1score < self.stats.val.f1score:
-                self.msg.msg_stats_best = 'Best case: epoch = %d, acc= %.2f, precision= %.2f, recall= %.2f, f1score= %.2f, loss = %.5f\n' % (
-                    epoch, 100 * self.stats.val.acc, 100 * self.stats.val.precision, 100 * self.stats.val.recall, 100 * self.stats.val.f1score, self.stats.val.loss)
+            self.msg.msg_stats_last = '\nLast epoch: acc= %.2f, precision= %.2f, recall= %.2f, ' \
+                                      'f1score= %.2f, loss = %.5f\n' % (100 * self.stats.val.acc,
+                                        100 * self.stats.val.precision, 100 * self.stats.val.recall,
+                                        100 * self.stats.val.f1score, self.stats.val.loss)
+            if new_best:
+                self.msg.msg_stats_best = 'Best case: epoch = %d, acc= %.2f, precision= %.2f, recall= %.2f, ' \
+                                          'f1score= %.2f, loss = %.5f\n' % (
+                                        epoch, 100 * self.stats.val.acc, 100 * self.stats.val.precision,
+                                        100 * self.stats.val.recall, 100 * self.stats.val.f1score, self.stats.val.loss)
                 self.best_f1score = self.stats.val.f1score
 
                 # msg_confm = self.stats.val.get_confm_str()
@@ -133,7 +142,8 @@ class Classification_Manager(SimpleTrainer):
                 bar.update()
             else:
                 self.msg.eval_str = '\n' + bar.get_message(step=True)
-                global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + self.msg.msg_stats_best + self.msg.eval_str)
+                global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + \
+                                   self.msg.msg_stats_best + self.msg.eval_str)
                 global_bar.update()
 
     class predict(SimpleTrainer.predict):

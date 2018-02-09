@@ -1,7 +1,7 @@
 # Problem type
-problem_type                = 'segmentation' # Option: ['segmentation','classification']
+problem_type                = 'segmentation'  # Option: ['segmentation','classification']
 # Model
-model_type                  = 'FCN8'   # Options: ['DenseNetFCN', 'FCN8']
+model_type                  = 'FCN8'          # Options: ['DenseNetFCN', 'FCN8', 'VGG16']
     ### DenseNetFCN options ####
 model_blocks                = 5               # Number of block densenetFCN_Custom only
 model_layers                = 4               # Number of layers per block densenetFCN_Custom only
@@ -11,7 +11,8 @@ model_dropout               = 0.0             # Dropout rate densenetFCN_Custom 
 model_compression           = 0.0             # Compression rate for DenseNet densenetFCN_Custom only
 
     ### load options
-pretrained_model            = 'basic'            # 'None': from scratch, 'basic': pretraned from imagenet, 'custom': personal model
+resume_experiment           = False           # Restore the best model obtained in the experiment defined if exist
+pretrained_model            = 'basic'         # 'None': from scratch, 'basic': pretraned from imagenet, 'custom': personal model
 input_model_path            = None            # Path and pretrained file to load [None uses experiment path and model name by default]
 load_weight_only            = True            # Recomended true, loads only weights and parameters
 basic_models_path           = './pretrained_models/' # Path for the basic models (ImageNet weights) where they will be download
@@ -66,7 +67,6 @@ void_class                  = 255   # void id or value on the image
 
 # Training
 epochs                      = 2     # Max number of epochs, use 0 to save directly a model, useful to make conversions
-initial_epoch               = 1     # Defines the starting epoch number
 valid_samples_epoch         = 10    # Number of validation images used to validate an epoch
 
     ### Optimizer ###
@@ -84,9 +84,11 @@ step_size                   = 20    # Step option: epoch counter to decrease lr
 milestone                   = [60,30,10] # MultiStep option: define different milestones (epochs) to decrease lr
     ### Save criteria
 save_condition              = 'valid_mIoU'        # ['always','(x)_loss','(x)_mAcc','(x)_mIoU'] x = valid or train_loss
+                                                  # ['precision', 'recall', 'f1score' for classification]
     ### Early Stopping
 early_stopping              = True
 stop_condition              = 'valid_mIoU'        # [(x)_loss','(x)_mAcc','(x)_mIoU'] x = valid or train_loss
+                                                  # ['precision', 'recall', 'f1score' for classification]
 patience                    = 5
 
 # Image preprocess

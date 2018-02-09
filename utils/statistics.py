@@ -34,3 +34,4 @@ class Statistics(object):
         self.val = TaskStats()
         self.test = TaskStats()
         self.train = TaskStats()
+        self.epoch = 0

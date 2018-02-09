@@ -23,8 +23,9 @@ class Configuration():
 
         if not os.path.exists(os.path.join(cf.exp_folder, 'json_stats/')):
             os.makedirs(os.path.join(cf.exp_folder, 'json_stats/'))
-        cf.train_json_file = os.path.join(cf.exp_folder, "json_stats/train_stats.json")
-        cf.val_train_json_file = os.path.join(cf.exp_folder, "json_stats/val_train_stats.json")
+        if not os.path.exists(os.path.join(cf.exp_folder, 'json_stats/train_history/')):
+            os.makedirs(os.path.join(cf.exp_folder, 'json_stats/train_history/'))
+        cf.train_json_path = os.path.join(cf.exp_folder, "json_stats/train_history/")
         cf.val_json_file = os.path.join(cf.exp_folder, "json_stats/val_stats.json")
         cf.test_json_file = os.path.join(cf.exp_folder, "json_stats/test_stats.json")
         cf.best_json_file = os.path.join(cf.exp_folder, "json_stats/best_model_stats.json")
@@ -37,7 +38,7 @@ class Configuration():
                 os.makedirs(cf.predict_path_output)
         cf.original_size = cf.size_image_test
 
-        if cf.input_model_path is None:
+        if cf.resume_experiment or cf.input_model_path is None:
             cf.input_model_path = os.path.join(cf.exp_folder, cf.model_name + '.pth')
         if cf.output_model_path is None:
             cf.output_model_path = cf.exp_folder

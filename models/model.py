@@ -87,25 +87,39 @@ class Model(nn.Module):
             torch.save(self, os.path.join(self.cf.exp_folder, self.cf.model_name + '.pth'))
 
     def save(self, stats):
-        save = False
         if self.cf.save_condition == 'always':
             save = True
-        elif self.cf.save_condition == 'train_loss':
-            if stats.train.loss < self.best_stats.train.loss:
-                save = True
-        elif self.cf.save_condition == 'valid_loss':
-            if stats.val.loss < self.best_stats.val.loss:
-                save = True
-        elif self.cf.save_condition == 'valid_mIoU':
-            if stats.val.mIoU > self.best_stats.val.mIoU:
-                save = True
-        elif self.cf.save_condition == 'valid_mAcc':
-            if stats.val.acc > self.best_stats.val.acc:
-                save = True
+        else:
+            save = self.check_stat(stats)
         if save:
             self.save_model()
             self.best_stats = copy.deepcopy(stats)
         return save
+
+    def check_stat(self, stats):
+        check = False
+        if self.cf.save_condition.lower() == 'train_loss':
+            if stats.train.loss < self.best_stats.train.loss:
+                check = True
+        elif self.cf.save_condition.lower() == 'valid_loss':
+            if stats.val.loss < self.best_stats.val.loss:
+                check = True
+        elif self.cf.save_condition.lower() == 'valid_miou':
+            if stats.val.mIoU > self.best_stats.val.mIoU:
+                check = True
+        elif self.cf.save_condition.lower() == 'valid_macc':
+            if stats.val.acc > self.best_stats.val.acc:
+                check = True
+        elif self.cf.save_condition.lower() == 'precision':
+            if stats.val.precision > self.best_stats.val.precision:
+                check = True
+        elif self.cf.save_condition.lower() == 'recall':
+            if stats.val.recall > self.best_stats.val.recall:
+                check = True
+        elif self.cf.save_condition.lower() == 'f1score':
+            if stats.val.f1score > self.best_stats.val.f1score:
+                check = True
+        return check
 
     def restore_model(self):
         print('\t Restoring weight from ' + self.cf.input_model_path + self.cf.model_name)
@@ -116,6 +130,7 @@ class Model(nn.Module):
         if os.path.exists(self.cf.best_json_file):
             with open(self.cf.best_json_file) as json_file:
                 json_data = json.load(json_file)
+                self.best_stats.epoch = json_data[0]['epoch']
                 self.best_stats.train = self.fill_statistics(json_data[0],self.best_stats.train)
                 self.best_stats.val = self.fill_statistics(json_data[1], self.best_stats.val)
 

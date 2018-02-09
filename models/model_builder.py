@@ -12,7 +12,6 @@ class Model_builder():
     def build(self):
         if self.cf.pretrained_model.lower() == 'custom' and not self.cf.load_weight_only:
             self.net = self.restore_model()
-            self.net.load_statistics()
             return self.net
 
         if self.cf.model_type.lower() == 'densenetfcn':
@@ -29,9 +28,10 @@ class Model_builder():
         else:
             raise ValueError('Unknown model')
 
-        if self.cf.pretrained_model.lower() == 'custom' and self.cf.load_weight_only:
+        if self.cf.resume_experiment or (self.cf.pretrained_model.lower() == 'custom' and self.cf.load_weight_only):
             self.net.restore_weights(os.path.join(self.cf.input_model_path))
-            self.net.load_statistics()
+            if self.cf.resume_experiment:
+                self.net.load_statistics()
 
         
 

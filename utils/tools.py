@@ -96,7 +96,7 @@ class Early_Stopping():
             else:
                 self.counter += 1
         if self.counter == self.patience:
-            self.logger_stats.write(' Early Stopping Interruption\n')
+            print(' Early Stopping Interruption\n')
             return True
         else:
             return False

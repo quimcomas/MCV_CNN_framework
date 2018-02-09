@@ -17,7 +17,10 @@ class SemanticSegmentation_Manager(SimpleTrainer):
     class train(SimpleTrainer.train):
         def __init__(self, logger_stats, model, cf, validator, stats, msg):
             super(SemanticSegmentation_Manager.train, self).__init__(logger_stats, model, cf, validator, stats, msg)
-            self.best_IoU = 0
+            if self.cf.resume_experiment:
+                self.msg.msg_stats_best = 'Best case [%s]: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
+                    self.cf.save_condition, self.model.net.best_stats.epoch, 100 * self.model.net.best_stats.val.mIoU,
+                    100 * self.model.net.best_stats.val.acc, self.model.net.best_stats.val.loss)
 
         def validate_epoch(self, valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar):
 
@@ -25,7 +28,7 @@ class SemanticSegmentation_Manager(SimpleTrainer):
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, 'val_epoch', epoch, global_bar=global_bar)
+                self.validator.start(criterion, valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -37,7 +40,7 @@ class SemanticSegmentation_Manager(SimpleTrainer):
                 # Set model in training mode
                 self.model.net.train()
 
-        def update_messages(self, epoch, epoch_time):
+        def update_messages(self, epoch, epoch_time, new_best):
             # Update logger
             epoch_time = time.time() - epoch_time
             self.logger_stats.write('\t Epoch step finished: %ds \n' % (epoch_time))
@@ -45,11 +48,10 @@ class SemanticSegmentation_Manager(SimpleTrainer):
             # Compute best stats
             self.msg.msg_stats_last = '\nLast epoch: mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
             100 * self.stats.val.mIoU, 100 * self.stats.val.acc, self.stats.val.loss)
-            if self.best_IoU < self.stats.val.mIoU:
-                self.msg.msg_stats_best = 'Best case: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
-                    epoch, 100 * self.stats.val.mIoU, 100 * self.stats.val.acc, self.stats.val.loss)
-                self.best_IoU = self.stats.val.mIoU
-
+            if new_best:
+                self.msg.msg_stats_best = 'Best case [%s]: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
+                                          self.cf.save_condition,epoch, 100 * self.stats.val.mIoU,
+                                          100 * self.stats.val.acc, self.stats.val.loss)
                 msg_confm = self.stats.val.get_confm_str()
                 self.logger_stats.write(msg_confm)
                 self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
