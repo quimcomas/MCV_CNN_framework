@@ -36,7 +36,7 @@ class FCN16(nn.Module):
         )'''
 
     def __init__(self, cf, n_class=21, pretrained=False, net_name='fcn16'):
-        super(FCN16, self).__init__(cf)
+        super(FCN16, self).__init__()
         # conv1
         self.conv1_1 = nn.Conv2d(3, 64, 3, padding=100)
         self.relu1_1 = nn.ReLU(inplace=True)

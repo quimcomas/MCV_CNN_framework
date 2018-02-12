@@ -3,8 +3,8 @@ from semantic_loss import Semantic_Loss
 
 
 class CrossEntropyLoss2d(Semantic_Loss):
-    def __init__(self, cf, weight=None, size_average=False, ignore_index=255):
-        super(CrossEntropyLoss2d, self).__init__(cf, weight, size_average, ignore_index)
+    def __init__(self, cf, weight=None, ignore_index=255):
+        super(CrossEntropyLoss2d, self).__init__(cf, weight, ignore_index)
 
     def forward(self, inputs, targets):
 
@@ -22,7 +22,7 @@ class CrossEntropyLoss2d(Semantic_Loss):
 
         loss = F.nll_loss(log_p, targets, weight=None, size_average=False)
 
-        # if self.size_average:
-        loss /= mask.data.sum()
+        if self.cf.normalize_loss:
+            loss /= mask.data.sum()
 
         return loss.mean()

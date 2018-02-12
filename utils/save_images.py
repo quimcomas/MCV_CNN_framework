@@ -115,16 +115,14 @@ def my_label2rgboverlay(labels, colors, image, bglabel=None,
 
 
 # Save 3 images (Image, mask and result)
-def save_img(writer, image_batch, mask_batch, output, epoch,
+def save_img(writer, image_batch, mask_batch, output, epoch, indexes, num_images, valid_len,
              color_map, classes, void_label, n_legend_rows=1):
-    #output[(mask_batch == void_label).nonzero()] = void_label
 
-    for j in range(output.shape[0]):
-        #img = image_batch[j]
+    valid_values = [(indx,i) for indx,i in enumerate(indexes) if i in range(0,valid_len,int(valid_len/(num_images-1)))]
 
-        #img = norm_01(img, mask_batch[j], -1)*255
+    for indx, value in valid_values:
 
-        label_out = my_label2rgb(output[j], bglabel=void_label,
+        label_out = my_label2rgb(output[indx], bglabel=void_label,
                                  colors=color_map)
         '''label_mask = my_label2rgboverlay(mask_batch[j], colors=color_map,
                                          image=img, bglabel=void_label,
@@ -142,7 +140,7 @@ def save_img(writer, image_batch, mask_batch, output, epoch,
         #label_overlay = np.concatenate((label_overlay, legend))
         #writer.add_image('Predictions/image', img, epoch)
         #writer.add_image('Predictions/mask', label_mask, epoch)
-        writer.add_image('Predictions/prediction', label_out, epoch)
+        writer.add_image('Predictions/prediction/'+str(value), label_out, epoch)
         #writer.add_image('Predictions/overlay', label_overlay, epoch)
         #out_name = os.path.join(out_images_folder, tag + '_epoch' + str(epoch) + '_img' + str(j) + '.png')
         #scipy.misc.toimage(combined_image).save(out_name)

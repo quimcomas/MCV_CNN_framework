@@ -9,6 +9,7 @@ sys.path.append('../')
 from utils.tools import confm_metrics2image
 from metrics.metrics import compute_mIoU, compute_accuracy_segmentation, extract_stats_from_confm
 from simple_trainer_manager import SimpleTrainer
+from utils.save_images import save_img
 
 class SemanticSegmentation_Manager(SimpleTrainer):
     def __init__(self, cf, model):
@@ -123,6 +124,11 @@ class SemanticSegmentation_Manager(SimpleTrainer):
                 self.msg.eval_str = '\n' + bar.get_message(step=True)
                 global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + self.msg.msg_stats_best + self.msg.eval_str)
                 global_bar.update()
+
+        def update_tensorboard(self,inputs,gts,predictions,epoch,indexes,val_len):
+            if epoch is not None:
+                save_img(self.writer, inputs, gts, predictions, epoch, indexes, self.cf.num_images, val_len,
+                        self.cf.color_map, self.cf.labels, self.cf.void_class, n_legend_rows=3)
 
     class predict(SimpleTrainer.predict):
         def __init__(self, logger_stats, model, cf):

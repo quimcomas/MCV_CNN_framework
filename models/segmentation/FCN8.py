@@ -151,8 +151,8 @@ class FCN8(Model):
 
 
     def copy_params_from_fcn16s(self):
-        fcn16s = FCN16()
-        fcn16s.load_state_dict(torch.load(self.pretrained_model))
+        fcn16s = FCN16(self.cf)
+        fcn16s.load_state_dict(torch.load('pretrained_models/fcn16s_from_caffe.pth'))
 
         for name, l1 in fcn16s.named_children():
             try:

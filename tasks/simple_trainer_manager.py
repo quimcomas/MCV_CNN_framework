@@ -11,7 +11,6 @@ from utils.ProgressBar import ProgressBar
 from utils.logger import Logger
 from utils.statistics import Statistics
 from utils.messages import Messages
-from utils.save_images import save_img
 from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm,compute_mIoU
 
 import os
@@ -103,7 +102,11 @@ class SimpleTrainer(object):
                     confm = compute_confusion_matrix(predictions, labels.cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
-                    self.stats.train.loss = train_loss.avg #/ (w*h*c)
+
+                    if self.cf.normalize_loss:
+                        self.stats.train.loss = train_loss.avg
+                    else:
+                        self.stats.train.loss = train_loss.avg / (N*w*h*c)
 
                     # Save stats
                     self.save_stats_batch((epoch - 1) * train_num_batches + i)
@@ -138,7 +141,7 @@ class SimpleTrainer(object):
 
             # Save model without training
             if self.cf.epochs == 0:
-                self.model.save_model(self.model.net)
+                self.model.net.save_model()
 
         def save_stats_epoch(self, epoch):
             # Save logger
@@ -252,12 +255,13 @@ class SimpleTrainer(object):
 
                 # Save epoch stats
                 self.stats.val.conf_m = confm_list
-                self.stats.val.loss = val_loss.avg / (w * h * c)
+                if not self.cf.normalize_loss:
+                    self.stats.val.loss = val_loss.avg / (n_images * w * h * c)
+                else:
+                    self.stats.val.loss = val_loss.avg
 
                 # Save predictions and generate overlaping
-                if self.cf.problem_type.lower() == 'segmentation':
-                    save_img(self.writer, inputs.cpu(), gts.cpu(), predictions, epoch, self.cf.color_map,
-                                                       self.cf.labels, self.cf.void_class, n_legend_rows=1)
+                self.update_tensorboard(inputs.cpu(),gts.cpu(),predictions,epoch,range(vi*self.cf.valid_batch_size,vi*self.cf.valid_batch_size+np.shape(predictions)[0]),valid_set.num_images)
 
                 # Update messages
                 self.update_msg(bar, global_bar)
@@ -274,6 +278,10 @@ class SimpleTrainer(object):
                 self.logger_stats.write_stat(self.stats.val, epoch, self.cf.val_json_file)
             elif mode == 'Test':
                 self.logger_stats.write_stat(self.stats.test, epoch, self.cf.test_json_file)
+
+        def update_tensorboard(self,inputs,gts,predictions,epoch,indexes,val_len):
+            pass
+
 
         def update_msg(self, bar, global_bar):
             if global_bar==None:
