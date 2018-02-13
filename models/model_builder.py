@@ -1,6 +1,7 @@
 import os
 
 from models.segmentation.FCN8 import FCN8
+from models.segmentation.FCN8AtOnce import FCN8AtOnce
 from models.segmentation.FCdenseNetTorch import FCDenseNet
 
 from models.classification.VGG16 import VGG16
@@ -23,6 +24,8 @@ class Model_builder():
                                 drop_rate=0, bottle_neck=False).cuda()
         elif self.cf.model_type.lower() == 'fcn8':
             self.net = FCN8(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'fcn8atonce':
+            self.net = FCN8AtOnce(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         elif self.cf.model_type.lower() == 'vgg16':
             self.net = VGG16(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         else:
@@ -32,7 +35,10 @@ class Model_builder():
             self.net.restore_weights(os.path.join(self.cf.input_model_path))
             if self.cf.resume_experiment:
                 self.net.load_statistics()
-
+        elif self.net.pretrained:
+            self.net.load_basic_weights()
+        else:
+            self.net.initialize_weights()
         
 
 

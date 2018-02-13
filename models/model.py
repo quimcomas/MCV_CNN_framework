@@ -13,13 +13,14 @@ class Model(nn.Module):
     def __init__(self, cf):
         super(Model, self).__init__()
         self.url = None
+        self.net_name = None
         self.cf = cf
         self.best_stats = Statistics()
 
     def forward(self, x):
         pass
 
-    def _initialize_weights(self):
+    def initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 m.weight.data.zero_()
@@ -47,10 +48,10 @@ class Model(nn.Module):
         weight[range(in_channels), range(out_channels), :, :] = filt
         return torch.from_numpy(weight).float()
 
-    def load_basic_weights(self, net_name):
+    def load_basic_weights(self):
         if not os.path.exists(self.cf.basic_models_path):
             os.makedirs(self.cf.basic_models_path)
-        filename = os.path.join(self.cf.basic_models_path, 'basic_'+ net_name +'.pth')
+        filename = os.path.join(self.cf.basic_models_path, 'basic_'+ self.net_name.lower() +'.pth')
         self.download_if_not_exist(filename)
         self.restore_weights(filename)
 

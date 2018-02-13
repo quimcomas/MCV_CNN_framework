@@ -22,6 +22,8 @@ class FCN8(Model):
     def __init__(self, cf, num_classes=21, pretrained=False, net_name='fcn8'):
         super(FCN8, self).__init__(cf)
         self.url = 'http://datasets.cvc.uab.es/models/pytorch/basic_fcn8.pth'
+        self.pretrained = pretrained
+        self.net_name = net_name
 
         # conv1
         self.conv1_1 = nn.Conv2d(3, 64, 3, padding=100)
@@ -84,12 +86,6 @@ class FCN8(Model):
             num_classes, num_classes, 16, stride=8, bias=False)
         self.upscore_pool4 = nn.ConvTranspose2d(
             num_classes, num_classes, 4, stride=2, bias=False)
-
-        self._initialize_weights()
-
-        if pretrained:
-            self.load_basic_weights(net_name)
-        #self.copy_params_from_fcn16s()
 
     def forward(self, x):
         h = x

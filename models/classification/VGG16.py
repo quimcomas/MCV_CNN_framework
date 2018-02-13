@@ -11,6 +11,8 @@ class VGG16(Model):
         super(VGG16, self).__init__(cf)
 
         self.url = 'http://datasets.cvc.uab.es/models/pytorch/basic_vgg16.pth'
+        self.pretrained = pretrained
+        self.net_name = net_name
 
         self.model = models.vgg16(pretrained=False, num_classes=num_classes)
 
@@ -68,10 +70,10 @@ class VGG16(Model):
             nn.Linear(4096, num_classes)
         )
 
-        if pretrained:
+        '''if pretrained:
             self.load_basic_weights(net_name)
         else:
-            self._initialize_weights()
+            self._initialize_weights()'''
 
     def forward(self, x):
         x = self.features(x)

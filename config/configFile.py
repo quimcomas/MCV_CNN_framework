@@ -1,7 +1,7 @@
 # Problem type
 problem_type                = 'segmentation'  # Option: ['segmentation','classification']
 # Model
-model_type                  = 'FCN8'          # Options: ['DenseNetFCN', 'FCN8', 'VGG16']
+model_type                  = 'FCN8'          # Options: ['DenseNetFCN', 'FCN8', 'FCN8atOnce' 'VGG16']
     ### DenseNetFCN options ####
 model_blocks                = 5               # Number of block densenetFCN_Custom only
 model_layers                = 4               # Number of layers per block densenetFCN_Custom only
@@ -23,6 +23,7 @@ output_model_path           = None            # Path to store the model using mo
 
 # Loss type
 loss_type                   = 'cross_entropy_segmentation' # options: ['cross_entropy_segmentation','focal_segmentation']
+normalize_loss              = True
 
 # General parameters
 
@@ -100,4 +101,5 @@ std                         = [0.18696375, 0.19017339, 0.18720214]#[0.21090189, 
 hflips                      = True
 
 # Tensorboard info
+predict_to_save = 2         #
 color_map = None
