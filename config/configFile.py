@@ -1,5 +1,5 @@
 # Problem type
-problem_type                = 'segmentation'  # Option: ['segmentation','classification']
+problem_type                = 'segmentation'  # Option: ['segmentation','classification','detection']
 # Model
 model_type                  = 'FCN8'          # Options: ['DenseNetFCN', 'FCN8', 'FCN8atOnce' 'VGG16']
     ### DenseNetFCN options ####
@@ -9,6 +9,19 @@ model_growth                = 12              # Growth rate per block (k) densen
 model_upsampling            = 'deconv'        # upsampling types available: 'upsampling' , 'subpixel', 'deconv'
 model_dropout               = 0.0             # Dropout rate densenetFCN_Custom only
 model_compression           = 0.0             # Compression rate for DenseNet densenetFCN_Custom only
+    ### RPN
+anchor_scales               = [8,16,32]
+anchor_ratios               = [0.5,1,2]
+feat_stride                 = 16 #[16, ]
+clobber_positives           = False # If an anchor statisfied by positive and negative conditions set to negative
+negative_overlap            = 0.3 # IOU < thresh: negative example
+positive_overlap            = 0.7 # IOU >= thresh: positive example
+fg_fraction                 = 0.5 # Max number of foreground examples
+anchor_samples              = 256 # Total number of anchor samples per image to calculate the loss
+positive_weight             = -1.0 # Set to -1.0 to use uniform example weighting
+rpn_pre_nms_top_n           = 6000 # Number of top scoring boxes to keep before apply NMS to RPN proposals
+rpn_post_nms_top_n          = 300 # Number of top scoring boxes to keep after applying NMS to RPN proposals
+rpn_nms_thresh              = 0.7 # NMS threshold used on RPN proposals
 
     ### load options
 resume_experiment           = False           # Restore the best model obtained in the experiment defined if exist
