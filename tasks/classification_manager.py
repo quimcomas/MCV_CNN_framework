@@ -23,12 +23,12 @@ class Classification_Manager(SimpleTrainer):
                             100 * self.model.net.best_stats.val.recall, 100 * self.model.net.best_stats.val.f1score,
                             self.model.net.best_stats.val.loss)
 
-        def validate_epoch(self, valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar):
+        def validate_epoch(self, valid_set, valid_loader, early_Stopping, epoch, global_bar):
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
+                self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:

@@ -14,6 +14,9 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.url = None
         self.net_name = None
+        self.loss = None
+        self.optimizer = None
+        self.scheduler = None
         self.cf = cf
         self.best_stats = Statistics()
 

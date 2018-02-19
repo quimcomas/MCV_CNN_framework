@@ -1,10 +1,15 @@
 import os
+import sys
 
+sys.path.append('../')
 from models.segmentation.FCN8 import FCN8
 from models.segmentation.FCN8AtOnce import FCN8AtOnce
 from models.segmentation.FCdenseNetTorch import FCDenseNet
-
 from models.classification.VGG16 import VGG16
+from models.detection.rpn import RPN
+from loss.loss_builder import Loss_Builder
+from utils.optimizer_builder import Optimizer_builder
+from scheduler.scheduler_builder import scheduler_builder
 
 class Model_builder():
     def __init__(self, cf):
@@ -26,6 +31,8 @@ class Model_builder():
             self.net = FCN8(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         elif self.cf.model_type.lower() == 'fcn8atonce':
             self.net = FCN8AtOnce(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'rpn':
+            self.net = RPN(self.cf, 512)
         elif self.cf.model_type.lower() == 'vgg16':
             self.net = VGG16(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         else:
@@ -39,6 +46,16 @@ class Model_builder():
             self.net.load_basic_weights()
         else:
             self.net.initialize_weights()
+
+        # Loss definition
+        if self.net.loss is None:
+            self.net.loss = Loss_Builder(self.cf).build().cuda()
+
+        # Optimizer definition
+        self.net.optimizer = Optimizer_builder().build(self.cf, self.net)
+
+        # Learning rate scheduler
+        self.net.scheduler = scheduler_builder().build(self.cf, self.net.optimizer)
         
 
 

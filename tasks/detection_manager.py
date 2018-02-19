@@ -6,10 +6,7 @@ from PIL import Image
 import cv2 as cv
 
 sys.path.append('../')
-from utils.tools import confm_metrics2image
-from metrics.metrics import compute_mIoU, compute_accuracy_segmentation, extract_stats_from_confm
 from simple_trainer_manager import SimpleTrainer
-from utils.save_images import save_img
 
 class SemanticSegmentation_Manager(SimpleTrainer):
     def __init__(self, cf, model):
@@ -28,7 +25,7 @@ class SemanticSegmentation_Manager(SimpleTrainer):
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
-
+                self.model.net.training = False
                 self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
@@ -39,7 +36,11 @@ class SemanticSegmentation_Manager(SimpleTrainer):
                         self.stop = True
 
                 # Set model in training mode
+                self.model.net.training = True
                 self.model.net.train()
+
+        def compute_gradients(self):
+            pass
 
         def update_messages(self, epoch, epoch_time, new_best):
             # Update logger

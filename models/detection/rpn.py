@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,11 +9,14 @@ sys.path.append('../')
 from models.model import Model
 from custom_layers.proposal_layer import ProposalLayer
 from custom_layers.anchor_target_layer import AnchorTargetLayer
+from loss.detection.smooth_l1_loss import SmoothL1Loss
 
 class RPN(Model):
     """ region proposal network """
     def __init__(self, cf, din):
         super(RPN, self).__init__(cf)
+
+        self.loss = SmoothL1Loss(cf)
         
         self.din = din  # get depth of input feature map, e.g., 512
 
@@ -32,6 +36,9 @@ class RPN(Model):
 
         # define anchor target layer
         self.RPN_anchor_target = AnchorTargetLayer(self.cf)
+
+        # define rpn mode
+        self.training = True
 
         self.rpn_loss_cls = 0
         self.rpn_loss_box = 0
@@ -64,10 +71,8 @@ class RPN(Model):
         rpn_bbox_pred = self.RPN_bbox_pred(rpn_conv1)
 
         # proposal layer
-        cfg_key = 'TRAIN' if self.training else 'TEST'
-
         rois = self.RPN_proposal((rpn_cls_prob.data, rpn_bbox_pred.data,
-                                 im_info, cfg_key))
+                                 im_info))
 
         self.rpn_loss_cls = 0
         self.rpn_loss_box = 0
@@ -96,7 +101,7 @@ class RPN(Model):
             rpn_bbox_outside_weights = Variable(rpn_bbox_outside_weights)
             rpn_bbox_targets = Variable(rpn_bbox_targets)
 
-            self.rpn_loss_box = _smooth_l1_loss(rpn_bbox_pred, rpn_bbox_targets, rpn_bbox_inside_weights,
+            self.rpn_loss_box = self.loss(rpn_bbox_pred, rpn_bbox_targets, rpn_bbox_inside_weights,
                                                             rpn_bbox_outside_weights, sigma=3, dim=[1,2,3])
 
         return rois, self.rpn_loss_cls, self.rpn_loss_box

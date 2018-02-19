@@ -1,7 +1,4 @@
-import torch.nn.functional as F
-
 from segmentation.crossEntropyLoss2d import CrossEntropyLoss2d
-
 from classification.crossEntropyLoss import CrossEntropyLoss
 
 class Loss_Builder():

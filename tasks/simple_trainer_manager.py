@@ -4,6 +4,7 @@ import time
 import numpy as np
 from torch.autograd import Variable
 import operator
+import os
 
 sys.path.append('../')
 from utils.tools import AverageMeter, Early_Stopping
@@ -12,8 +13,6 @@ from utils.logger import Logger
 from utils.statistics import Statistics
 from utils.messages import Messages
 from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm,compute_mIoU
-
-import os
 from tensorboardX import SummaryWriter
 
 class SimpleTrainer(object):
@@ -42,8 +41,8 @@ class SimpleTrainer(object):
             self.msg = msg
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path,'train'))
 
-        def start(self, criterion, optimizer, train_loader, train_set, valid_set=None,
-                  valid_loader=None, scheduler=None):
+        def start(self, train_loader, train_set, valid_set=None,
+                  valid_loader=None):
             train_num_batches = math.ceil(train_set.num_images / float(self.cf.train_batch_size))
             val_num_batches = 0 if valid_set is None else math.ceil(valid_set.num_images / \
                                                                     float(self.cf.valid_batch_size))
@@ -85,21 +84,19 @@ class SimpleTrainer(object):
 
                     N,w,h,c = inputs.size()
                     inputs = Variable(inputs).cuda()
-                    labels = Variable(labels).cuda()
+                    self.labels = Variable(labels).cuda()
 
                     # Predict model
-                    optimizer.zero_grad()
-                    outputs = self.model.net(inputs)
-                    predictions = outputs.data.max(1)[1].cpu().numpy()
+                    self.model.net.optimizer.zero_grad()
+                    self.outputs = self.model.net(inputs)
+                    predictions = self.outputs.data.max(1)[1].cpu().numpy()
 
                     # Compute gradients
-                    loss = criterion(outputs, labels)
-                    loss.backward()
-                    optimizer.step()
+                    self.compute_gradients()
 
                     # Compute batch stats
-                    train_loss.update(loss.data[0], N)
-                    confm = compute_confusion_matrix(predictions, labels.cpu().data.numpy(), self.cf.num_classes,
+                    train_loss.update(self.loss.data[0], N)
+                    confm = compute_confusion_matrix(predictions, self.compute_gradients().cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
 
@@ -122,11 +119,11 @@ class SimpleTrainer(object):
                                                                                 'train_epoch_' + str(epoch) + '.json'))
 
                 # Validate epoch
-                self.validate_epoch(valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar)
+                self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, global_bar)
 
                 # Update scheduler
-                if scheduler is not None:
-                    scheduler.step(self.stats.val.loss)
+                if self.model.net.scheduler is not None:
+                    self.model.net.scheduler.step(self.stats.val.loss)
 
                 # Saving model if score improvement
                 new_best = self.model.net.save(self.stats)
@@ -155,19 +152,24 @@ class SimpleTrainer(object):
             if batch is not None:
                 self.writer.add_scalar('losses/batch', self.stats.train.loss, batch)
 
+        def compute_gradients(self):
+            self.loss = self.model.net.loss(self.outputs, self.labels)
+            self.loss.backward()
+            self.model.net.optimizer.step()
+
         def compute_stats(self, confm_list, train_loss):
             TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
             mean_accuracy = compute_accuracy(TP_list, TN_list, FP_list, FN_list)
             self.stats.train.acc = np.nanmean(mean_accuracy)
             self.stats.train.loss = train_loss.avg
 
-        def validate_epoch(self,valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar):
+        def validate_epoch(self,valid_set, valid_loader, early_Stopping, epoch, global_bar):
 
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
+                self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -223,7 +225,7 @@ class SimpleTrainer(object):
             self.msg = msg
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path, 'validation'))
 
-        def start(self, criterion, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None):
+        def start(self, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None):
             confm_list = np.zeros((self.cf.num_classes,self.cf.num_classes))
 
             val_loss = AverageMeter()
@@ -248,7 +250,7 @@ class SimpleTrainer(object):
                 predictions = outputs.data.max(1)[1].cpu().numpy()
 
                 # Compute batch stats
-                val_loss.update(criterion(outputs, gts).data[0] / n_images, n_images)
+                val_loss.update(self.model.net.loss(outputs, gts).data[0] / n_images, n_images)
                 confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
                                                  self.cf.void_class)
                 confm_list = map(operator.add, confm_list, confm)
@@ -261,7 +263,10 @@ class SimpleTrainer(object):
                     self.stats.val.loss = val_loss.avg
 
                 # Save predictions and generate overlaping
-                self.update_tensorboard(inputs.cpu(),gts.cpu(),predictions,epoch,range(vi*self.cf.valid_batch_size,vi*self.cf.valid_batch_size+np.shape(predictions)[0]),valid_set.num_images)
+                self.update_tensorboard(inputs.cpu(),gts.cpu(),
+                                        predictions,epoch,range(vi*self.cf.valid_batch_size,
+                                                                vi*self.cf.valid_batch_size+np.shape(predictions)[0]),
+                                                                valid_set.num_images)
 
                 # Update messages
                 self.update_msg(bar, global_bar)
