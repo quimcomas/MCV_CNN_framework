@@ -2,10 +2,10 @@ import sys
 from torch import nn
 import torchvision.models.vgg as models
 sys.path.append('../')
-from models.model import Model
+from models.networks.network import Net
 import math
 
-class VGG16(Model):
+class VGG16(Net):
 
     def __init__(self, cf, num_classes=21, pretrained=False, net_name='vgg16'):
         super(VGG16, self).__init__(cf)

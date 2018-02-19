@@ -20,8 +20,8 @@ class SemanticSegmentation_Manager(SimpleTrainer):
             super(SemanticSegmentation_Manager.train, self).__init__(logger_stats, model, cf, validator, stats, msg)
             if self.cf.resume_experiment:
                 self.msg.msg_stats_best = 'Best case [%s]: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
-                    self.cf.save_condition, self.model.net.best_stats.epoch, 100 * self.model.net.best_stats.val.mIoU,
-                    100 * self.model.net.best_stats.val.acc, self.model.net.best_stats.val.loss)
+                    self.cf.save_condition, self.model.best_stats.epoch, 100 * self.model.best_stats.val.mIoU,
+                    100 * self.model.best_stats.val.acc, self.model.best_stats.val.loss)
 
         def validate_epoch(self, valid_set, valid_loader, early_Stopping, epoch, global_bar):
 

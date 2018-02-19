@@ -2,14 +2,14 @@ import sys
 import torch
 from torch import nn
 sys.path.append('../')
-from models.model import Model
+from models.networks.network import Net
 
 __all__ = ['FCDenseNet', 'fcdensenet_tiny', 'fcdensenet56_nodrop',
            'fcdensenet56', 'fcdensenet67', 'fcdensenet103',
            'fcdensenet103_nodrop']
 
 
-class DenseBlock(Model):
+class DenseBlock(Net):
 
     def __init__(self, nIn, growth_rate, depth, drop_rate=0, only_new=False,
                  bottle_neck=False):
@@ -55,7 +55,7 @@ class DenseBlock(Model):
             )
 
 
-class FCDenseNet(Model):
+class FCDenseNet(Net):
 
     def __init__(self, cf, nb_layers_per_block, growth_rate, nb_dense_block=5, n_channel_start=48,
                  n_classes=12, drop_rate=0, bottle_neck=False):

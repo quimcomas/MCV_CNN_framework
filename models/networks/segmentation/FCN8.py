@@ -5,9 +5,9 @@ from torch import nn
 
 from FCN16 import FCN16
 sys.path.append('../')
-from models.model import Model
+from models.networks.network import Net
 
-class FCN8(Model):
+class FCN8(Net):
 
 
     '''@classmethod

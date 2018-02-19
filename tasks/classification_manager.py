@@ -18,10 +18,10 @@ class Classification_Manager(SimpleTrainer):
             super(Classification_Manager.train, self).__init__(logger_stats, model, cf, validator, stats, msg)
             if self.cf.resume_experiment:
                 self.msg.msg_stats_best = 'Best case: epoch = %d, acc= %.2f, precision= %.2f, recall= %.2f, ' \
-                                          'f1score= %.2f, loss = %.5f\n' % (self.model.net.best_stats.epoch,
-                            100 * self.model.net.best_stats.val.acc, 100 * self.model.net.best_stats.val.precision,
-                            100 * self.model.net.best_stats.val.recall, 100 * self.model.net.best_stats.val.f1score,
-                            self.model.net.best_stats.val.loss)
+                                          'f1score= %.2f, loss = %.5f\n' % (self.model.best_stats.epoch,
+                            100 * self.model.best_stats.val.acc, 100 * self.model.best_stats.val.precision,
+                            100 * self.model.best_stats.val.recall, 100 * self.model.best_stats.val.f1score,
+                            self.model.best_stats.val.loss)
 
         def validate_epoch(self, valid_set, valid_loader, early_Stopping, epoch, global_bar):
             if valid_set is not None and valid_loader is not None:

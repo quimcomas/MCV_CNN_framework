@@ -34,11 +34,14 @@ class SimpleTrainer(object):
             self.cf = cf
             self.validator = validator
             self.logger_stats.write('\n- Starting train <--- \n')
-            self.curr_epoch = 1 if self.model.net.best_stats.epoch==0 else self.model.net.best_stats.epoch
+            self.curr_epoch = 1 if self.model.best_stats.epoch==0 else self.model.best_stats.epoch
             self.stop = False
             self.stats = stats
             self.best_acc = 0
             self.msg = msg
+            self.loss = None
+            self.outputs = None
+            self.labels = None
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path,'train'))
 
         def start(self, train_loader, train_set, valid_set=None,
@@ -87,7 +90,7 @@ class SimpleTrainer(object):
                     self.labels = Variable(labels).cuda()
 
                     # Predict model
-                    self.model.net.optimizer.zero_grad()
+                    self.model.optimizer.zero_grad()
                     self.outputs = self.model.net(inputs)
                     predictions = self.outputs.data.max(1)[1].cpu().numpy()
 
@@ -96,7 +99,7 @@ class SimpleTrainer(object):
 
                     # Compute batch stats
                     train_loss.update(self.loss.data[0], N)
-                    confm = compute_confusion_matrix(predictions, self.compute_gradients().cpu().data.numpy(), self.cf.num_classes,
+                    confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
 
@@ -122,11 +125,11 @@ class SimpleTrainer(object):
                 self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, global_bar)
 
                 # Update scheduler
-                if self.model.net.scheduler is not None:
-                    self.model.net.scheduler.step(self.stats.val.loss)
+                if self.model.scheduler is not None:
+                    self.model.scheduler.step(self.stats.val.loss)
 
                 # Saving model if score improvement
-                new_best = self.model.net.save(self.stats)
+                new_best = self.model.save(self.stats)
                 if new_best:
                     self.logger_stats.write_best_stats(self.stats, epoch, self.cf.best_json_file)
 
@@ -138,7 +141,7 @@ class SimpleTrainer(object):
 
             # Save model without training
             if self.cf.epochs == 0:
-                self.model.net.save_model()
+                self.model.save_model()
 
         def save_stats_epoch(self, epoch):
             # Save logger
@@ -153,9 +156,9 @@ class SimpleTrainer(object):
                 self.writer.add_scalar('losses/batch', self.stats.train.loss, batch)
 
         def compute_gradients(self):
-            self.loss = self.model.net.loss(self.outputs, self.labels)
+            self.loss = self.model.loss(self.outputs, self.labels)
             self.loss.backward()
-            self.model.net.optimizer.step()
+            self.model.optimizer.step()
 
         def compute_stats(self, confm_list, train_loss):
             TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
@@ -250,7 +253,7 @@ class SimpleTrainer(object):
                 predictions = outputs.data.max(1)[1].cpu().numpy()
 
                 # Compute batch stats
-                val_loss.update(self.model.net.loss(outputs, gts).data[0] / n_images, n_images)
+                val_loss.update(self.model.loss(outputs, gts).data[0] / n_images, n_images)
                 confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
                                                  self.cf.void_class)
                 confm_list = map(operator.add, confm_list, confm)

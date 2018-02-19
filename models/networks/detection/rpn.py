@@ -6,12 +6,12 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 sys.path.append('../')
-from models.model import Model
-from custom_layers.proposal_layer import ProposalLayer
-from custom_layers.anchor_target_layer import AnchorTargetLayer
-from loss.detection.smooth_l1_loss import SmoothL1Loss
+from models.networks.network import Net
+from models.networks.custom_layers.proposal_layer import ProposalLayer
+from models.networks.custom_layers.anchor_target_layer import AnchorTargetLayer
+from models.loss.detection.smooth_l1_loss import SmoothL1Loss
 
-class RPN(Model):
+class RPN(Net):
     """ region proposal network """
     def __init__(self, cf, din):
         super(RPN, self).__init__(cf)
