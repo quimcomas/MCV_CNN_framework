@@ -10,7 +10,7 @@ from dataloader.dataloader_builder import Dataloader_Builder
 def main():
     start_time = time.time()
     # Input arguments
-    parser = argparse.ArgumentParser(description="TensorFlow framework for Semantic Segmentation")
+    parser = argparse.ArgumentParser(description="PyTorch framework for Semantic Segmentation")
     parser.add_argument("--config_file",
                         type=str,
                         default='config/configFile.py',
