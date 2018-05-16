@@ -4,10 +4,11 @@ import shutil
 import numpy as np
 
 class Configuration():
-    def __init__(self, config_path, exp_name, exp_folder):
+    def __init__(self, config_path, exp_name, exp_folder, debug):
         self.config_path = config_path
         self.exp_name = exp_name
         self.exp_folder = os.path.join(exp_folder, exp_name)
+        self.debug = debug
         if not os.path.exists(self.exp_folder):
             os.makedirs(self.exp_folder)
 
@@ -16,6 +17,7 @@ class Configuration():
         cf.config_path = self.config_path
         cf.exp_name = self.exp_name
         cf.exp_folder = self.exp_folder
+        cf.debug = self.debug
         cf.tensorboard_path = os.path.join(self.exp_folder,'tensorboard/')
         cf.log_file = os.path.join(cf.exp_folder, "logfile.log")
         cf.log_file_stats = os.path.join(cf.exp_folder, "logfile_stats.log")

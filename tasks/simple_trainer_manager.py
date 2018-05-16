@@ -3,6 +3,7 @@ import sys
 import time
 import numpy as np
 from torch.autograd import Variable
+import torch
 import operator
 import os
 
@@ -87,6 +88,7 @@ class SimpleTrainer(object):
 
                     N,w,h,c = inputs.size()
                     inputs = Variable(inputs).cuda()
+                    self.inputs = inputs
                     self.labels = Variable(labels).cuda()
 
                     # Predict model
@@ -106,13 +108,14 @@ class SimpleTrainer(object):
                     if self.cf.normalize_loss:
                         self.stats.train.loss = train_loss.avg
                     else:
-                        self.stats.train.loss = train_loss.avg / (N*w*h*c)
+                        self.stats.train.loss = train_loss.avg
 
-                    # Save stats
-                    self.save_stats_batch((epoch - 1) * train_num_batches + i)
+                    if not self.cf.debug:
+                        # Save stats
+                        self.save_stats_batch((epoch - 1) * train_num_batches + i)
 
-                    # Update epoch messages
-                    self.update_epoch_messages(epoch_bar, global_bar, train_num_batches, epoch, i)
+                        # Update epoch messages
+                        self.update_epoch_messages(epoch_bar, global_bar, train_num_batches, epoch, i)
 
                 # Save stats
                 self.stats.train.conf_m = confm_list
@@ -156,9 +159,24 @@ class SimpleTrainer(object):
                 self.writer.add_scalar('losses/batch', self.stats.train.loss, batch)
 
         def compute_gradients(self):
-            self.loss = self.model.loss(self.outputs, self.labels)
+
+            #list_outs = np.asarray([self.model.net(self.inputs) for run_dropout in range(10)])
+            outs = None
+            for run_dropout in range(10):
+                predict = self.model.net(self.inputs)
+                n,w,h,c = predict.size()
+                predict = predict.view(1,n,w,h,c)
+                if  outs is None:
+                    outs = predict
+                else:
+                #			print outs.size()
+                #			print predict.size()
+                    outs = torch.cat((outs,predict),0)
+            self.loss = self.model.loss(outs, self.labels)
             self.loss.backward()
             self.model.optimizer.step()
+
+            print [p.grad.data.numpy() * 2 for p in list(self.model.net.parameters())]
 
         def compute_stats(self, confm_list, train_loss):
             TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
@@ -252,8 +270,20 @@ class SimpleTrainer(object):
                 outputs = self.model.net(inputs)
                 predictions = outputs.data.max(1)[1].cpu().numpy()
 
+	        outs = None
+     	        for run_dropout in range(10):
+			predict = self.model.net(inputs)
+			n,w,h,c = predict.size()
+			predict = predict.view(1,n,w,h,c)
+			if  outs is None:
+				outs = predict
+			else:
+	#			print outs.size()
+	#			print predict.size()
+				outs = torch.cat((outs,predict),0)
+
                 # Compute batch stats
-                val_loss.update(self.model.loss(outputs, gts).data[0] / n_images, n_images)
+                val_loss.update(self.model.loss(outs, gts).data[0] / n_images, n_images)
                 confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
                                                  self.cf.void_class)
                 confm_list = map(operator.add, confm_list, confm)
@@ -261,7 +291,7 @@ class SimpleTrainer(object):
                 # Save epoch stats
                 self.stats.val.conf_m = confm_list
                 if not self.cf.normalize_loss:
-                    self.stats.val.loss = val_loss.avg / (n_images * w * h * c)
+                    self.stats.val.loss = val_loss.avg
                 else:
                     self.stats.val.loss = val_loss.avg
 

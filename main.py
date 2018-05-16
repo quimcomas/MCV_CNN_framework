@@ -26,11 +26,16 @@ def main():
                         default='/home/jlgomez/Experiments/',
                         help="Experiment folder path")
 
+    parser.add_argument("--debug",
+                        dest='debug',
+                        action='store_true',
+                        help="experiment mode")
+
     args = parser.parse_args()
 
     # Prepare configutation
     print ('Loading configuration ...')
-    config = Configuration(args.config_file, args.exp_name, args.exp_folder)
+    config = Configuration(args.config_file, args.exp_name, args.exp_folder, args.debug)
     cf = config.Load()
     # Enable log file
     logger_debug = Logger(cf.log_file_debug)

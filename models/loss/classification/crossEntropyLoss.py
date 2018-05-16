@@ -10,7 +10,4 @@ class CrossEntropyLoss(Classification_Loss):
 
     def forward(self, inputs, targets):
         loss = self.criterion(inputs, targets.view(-1))
-        if self.cf.normalize_loss:
-            n, c, h, w = inputs.size()
-            loss = loss / (n*h*w)
         return loss

@@ -42,7 +42,7 @@ class fromFileDatasetClassification(Data_loader):
 
     def __getitem__(self, idx):
         img_path = self.image_names[self.indexes[idx]]
-        img = self.load_img(img_path, self.resize, self.cf.grayscale, order=1)
+        img = np.asarray(self.Load_image(img_path, self.resize, self.cf.grayscale, order=1))
         gt = [self.gt[self.indexes[idx]]]
         if self.transform is not None:
             img, _ = self.transform(img, None)
