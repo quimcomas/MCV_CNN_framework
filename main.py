@@ -2,10 +2,7 @@ import time
 from tasks.semanticSegmentator_manager import SemanticSegmentation_Manager
 from tasks.classification_manager import Classification_Manager
 from config.configuration import Configuration
-from loss.loss_builder import Loss_Builder
 from models.model_builder import Model_builder
-from utils.optimizer_builder import Optimizer_builder
-from scheduler.scheduler_builder import scheduler_builder
 from utils.logger import Logger
 from dataloader.dataloader_builder import Dataloader_Builder
 
@@ -33,15 +30,6 @@ def main():
     else:
         raise ValueError('Unknown problem type')
 
-    # Loss definition
-    criterion = Loss_Builder(cf).build().cuda()
-
-    # Optimizer definition
-    optimizer = Optimizer_builder().build(cf, model.net)
-
-    # Learning rate scheduler
-    scheduler = scheduler_builder().build(cf, optimizer)
-
     # Create dataloader builder
     dataloader = Dataloader_Builder(cf)
 
@@ -55,12 +43,11 @@ def main():
             logger_debug.write('\n- Reading Validation dataset: ')
             dataloader.build_valid(cf.valid_samples_epoch, cf.valid_images_txt, cf.valid_gt_txt,
                                    cf.resize_image_valid, cf.valid_batch_size)
-            problem_manager.trainer.start(criterion, optimizer, dataloader.train_loader, dataloader.train_set,
-                                          dataloader.loader_set, dataloader.loader, scheduler)
+            problem_manager.trainer.start(dataloader.train_loader, dataloader.train_set,
+                                          dataloader.loader_set, dataloader.loader)
         else:
             # Train without validation inside epoch
-            problem_manager.trainer.start(criterion, optimizer, dataloader.train_loader, dataloader.train_set,
-                                          scheduler=scheduler)
+            problem_manager.trainer.start(dataloader.train_loader, dataloader.train_set)
         train_time = time.time() - train_time
         logger_debug.write('\t Train step finished: %ds ' % (train_time))
 
@@ -75,7 +62,7 @@ def main():
             # If the Dataloader for validation was used on train, only update the total number of images to take
             dataloader.loader_set.update_indexes(cf.valid_samples, valid=True) #valid=True avoids shuffle for validation
         logger_debug.write('\n- Starting validation <---')
-        problem_manager.validator.start(criterion, dataloader.loader_set, dataloader.loader, 'val')
+        problem_manager.validator.start(dataloader.loader_set, dataloader.loader, 'Validation')
         valid_time = time.time() - valid_time
         logger_debug.write('\t Validation step finished: %ds ' % (valid_time))
 
@@ -86,7 +73,7 @@ def main():
         dataloader.build_valid(cf.test_samples, cf.test_images_txt, cf.test_gt_txt,
                                cf.resize_image_test, cf.test_batch_size)
         logger_debug.write('\n - Starting test <---')
-        problem_manager.validator.start(criterion, dataloader.loader_set, dataloader.loader, 'test')
+        problem_manager.validator.start(dataloader.loader_set, dataloader.loader, 'Test')
         test_time = time.time() - test_time
         logger_debug.write('\t Test step finished: %ds ' % (test_time))
 

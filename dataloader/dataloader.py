@@ -3,6 +3,7 @@ import os
 import skimage.io as io
 from skimage.color import rgb2gray, gray2rgb
 import skimage.transform
+import cv2 as cv
 from PIL import Image
 
 class Data_loader(Dataset):
@@ -48,6 +49,21 @@ class Data_loader(Dataset):
             img = img.convert('RGB')
         elif img.mode == 'RGB' and grayscale:
             img = img.convert('LA')
+        return img
+
+    # Load image using Skimage
+    def load_img_cv(self, path, resize=None, grayscale=False, order=1):
+        # Load image
+        img = cv.imread(path)[...,::-1]
+        if resize is not None:
+            img = cv.resize(img, resize)
+
+        # Color conversion
+        if len(img.shape) == 2 and not grayscale:
+            img = gray2rgb(img)
+        elif len(img.shape) > 2 and img.shape[2] == 3 and grayscale:
+            img = rgb2gray(img)
+        # Return image
         return img
 
     # Load image using Skimage

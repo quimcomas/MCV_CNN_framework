@@ -24,7 +24,10 @@ class fromFileDatasetClassification(Data_loader):
             gt = f.readlines()
         # remove whitespace characters like `\n` at the end of each line
         lines = [x.strip() for x in gt]
-        self.gt = [int(line) for line in lines]
+        if cf.map_labels is None:
+            self.gt = [int(line) for line in lines]
+        else:
+            self.gt = [int(cf.map_labels[line]) for line in lines]
 
         if len(self.gt) != len(self.image_names):
             raise ValueError('number of images != number GT images')
@@ -39,7 +42,7 @@ class fromFileDatasetClassification(Data_loader):
 
     def __getitem__(self, idx):
         img_path = self.image_names[self.indexes[idx]]
-        img = self.load_img(img_path, self.resize, self.cf.grayscale, order=1)
+        img = np.asarray(self.Load_image(img_path, self.resize, self.cf.grayscale, order=1))
         gt = [self.gt[self.indexes[idx]]]
         if self.transform is not None:
             img, _ = self.transform(img, None)

@@ -25,13 +25,15 @@ class Configuration():
                 cf = edict(yaml.load(f))
         cf = self.Parser_to_config(cf)
         cf.tensorboard_path = os.path.join(cf.exp_folder,'tensorboard/')
+        cf.debug = self.args.debug
         cf.log_file = os.path.join(cf.exp_folder, "logfile.log")
         cf.log_file_stats = os.path.join(cf.exp_folder, "logfile_stats.log")
         cf.log_file_debug = os.path.join(cf.exp_folder, "logfile_debug.log")
         if not os.path.exists(os.path.join(cf.exp_folder, 'json_stats/')):
             os.makedirs(os.path.join(cf.exp_folder, 'json_stats/'))
-        cf.train_json_file = os.path.join(cf.exp_folder, "json_stats/train_stats.json")
-        cf.val_train_json_file = os.path.join(cf.exp_folder, "json_stats/val_train_stats.json")
+        if not os.path.exists(os.path.join(cf.exp_folder, 'json_stats/train_history/')):
+            os.makedirs(os.path.join(cf.exp_folder, 'json_stats/train_history/'))
+        cf.train_json_path = os.path.join(cf.exp_folder, "json_stats/train_history/")
         cf.val_json_file = os.path.join(cf.exp_folder, "json_stats/val_stats.json")
         cf.test_json_file = os.path.join(cf.exp_folder, "json_stats/test_stats.json")
         cf.best_json_file = os.path.join(cf.exp_folder, "json_stats/best_model_stats.json")
@@ -51,7 +53,7 @@ class Configuration():
             if not os.path.exists(cf.output_model_path):
                 os.makedirs(cf.output_model_path)
         if cf.map_labels != 'None':
-            cf.map_labels = np.asarray(cf.map_labels,dtype=np.uint16)
+            cf.map_labels = {value: idx for idx, value in enumerate(cf.map_labels)}
         # if cf.pretrained_model is None:
         #     cf.pretrained_model = 'None'
         if not cf.pretrained_model.lower() in ('none', 'basic', 'custom'):
@@ -61,7 +63,7 @@ class Configuration():
         else:
             cf.basic_pretrained_model = False
         if cf.basic_models_path == 'None':
-            cf.basic_models_path = './pretrained_model/',
+            cf.basic_models_path = './pretrained_model/'
         return cf
 
     def Parse_args(self):
@@ -87,12 +89,20 @@ class Configuration():
                             type=str,
                             help="Type of problem, Options: ['segmentation','classification']")
 
+        parser.add_argument("--debug",
+                            dest='debug',
+                            action='store_true',
+                            help="experiment mode")
+
         # Model
         parser.add_argument("--model", dest='model_type',
                             type=str,
                             help="Model name, Options: ['DenseNetFCN', 'FCN8']")
 
         ### load options
+        parser.add_argument("--resume_experiment",
+                            type=bool,
+                            help="Restore the best model obtained in the experiment defined if exist")
         parser.add_argument("--pretrained_model",
                             type=str,
                             help="Pretarined Model, Options: 'None': from scratch, 'basic': pretraned from imagenet, "
@@ -310,6 +320,8 @@ class Configuration():
         if self.args.model_type is not None:
             cf.model_type = self.args.model_type
             ### load options
+        if self.args.resume_experiment is not None:
+            cf.resume_experiment = self.args.resume_experiment
         if self.args.pretrained_model is not None:
             cf.pretrained_model = self.args.pretrained_model
         if self.args.input_model_path is not None:
@@ -441,5 +453,4 @@ class Configuration():
             # Data augmentation
         if self.args.hflips is not None:
             cf.hflips = self.args.hflips
-
         return cf

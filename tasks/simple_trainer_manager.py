@@ -3,7 +3,9 @@ import sys
 import time
 import numpy as np
 from torch.autograd import Variable
+import torch
 import operator
+import os
 
 sys.path.append('../')
 from utils.tools import AverageMeter, Early_Stopping
@@ -12,8 +14,6 @@ from utils.logger import Logger
 from utils.statistics import Statistics
 from utils.messages import Messages
 from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm,compute_mIoU
-
-import os
 from tensorboardX import SummaryWriter
 
 class SimpleTrainer(object):
@@ -21,10 +21,8 @@ class SimpleTrainer(object):
         self.cf = cf
         self.model = model
         self.logger_stats = Logger(cf.log_file_stats)
-        self.logger_stats.create_stats_json(self.cf)
         self.stats = Statistics()
         self.msg = Messages()
-
         self.validator = self.validation(self.logger_stats, self.model, cf, self.stats, self.msg)
         self.trainer = self.train(self.logger_stats, self.model, cf, self.validator, self.stats, self.msg)
         self.predictor = self.predict(self.logger_stats, self.model, cf)
@@ -37,16 +35,21 @@ class SimpleTrainer(object):
             self.cf = cf
             self.validator = validator
             self.logger_stats.write('\n- Starting train <--- \n')
-            self.curr_epoch = self.cf.initial_epoch
+            self.curr_epoch = 1 if self.model.best_stats.epoch==0 else self.model.best_stats.epoch
             self.stop = False
             self.stats = stats
             self.best_acc = 0
             self.msg = msg
+            self.loss = None
+            self.outputs = None
+            self.labels = None
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path,'train'))
 
-        def start(self, criterion, optimizer, train_loader, train_set, valid_set=None, valid_loader=None, scheduler=None):
+        def start(self, train_loader, train_set, valid_set=None,
+                  valid_loader=None):
             train_num_batches = math.ceil(train_set.num_images / float(self.cf.train_batch_size))
-            val_num_batches = 0 if valid_set is None else math.ceil(valid_set.num_images / float(self.cf.valid_batch_size))
+            val_num_batches = 0 if valid_set is None else math.ceil(valid_set.num_images / \
+                                                                    float(self.cf.valid_batch_size))
             # Define early stopping control
             if self.cf.early_stopping:
                 early_Stopping = Early_Stopping(self.cf)
@@ -68,11 +71,13 @@ class SimpleTrainer(object):
                 self.logger_stats.write('\t ------ Epoch: ' + str(epoch) + ' ------ \n')
 
                 # Initialize epoch progress bar
-                self.msg.accum_str = '\n\nEpoch %d/%d estimated time...\n' % (epoch, self.cf.epochs + 1 - self.curr_epoch)
+                self.msg.accum_str = '\n\nEpoch %d/%d estimated time...\n' % \
+                                     (epoch, self.cf.epochs)
                 epoch_bar = ProgressBar(train_num_batches, lenBar=20)
                 epoch_bar.update(show=False)
 
                 # Initialize stats
+                self.stats.epoch = epoch
                 train_loss = AverageMeter()
                 confm_list = np.zeros((self.cf.num_classes, self.cf.num_classes))
 
@@ -83,60 +88,63 @@ class SimpleTrainer(object):
 
                     N,w,h,c = inputs.size()
                     inputs = Variable(inputs).cuda()
-                    labels = Variable(labels).cuda()
+                    self.inputs = inputs
+                    self.labels = Variable(labels).cuda()
 
                     # Predict model
-                    optimizer.zero_grad()
-                    outputs = self.model.net(inputs)
-                    predictions = outputs.data.max(1)[1].cpu().numpy()
+                    self.model.optimizer.zero_grad()
+                    self.outputs = self.model.net(inputs)
+                    predictions = self.outputs.data.max(1)[1].cpu().numpy()
 
                     # Compute gradients
-                    loss = criterion(outputs, labels)
-                    loss.backward()
-                    optimizer.step()
+                    self.compute_gradients()
 
                     # Compute batch stats
-                    train_loss.update(loss.data[0], N)
-                    confm = compute_confusion_matrix(predictions, labels.cpu().data.numpy(), self.cf.num_classes,
+                    train_loss.update(self.loss.data[0], N)
+                    confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
-                    self.stats.train.loss = train_loss.avg / (w*h*c)
 
-                    # Save stats
-                    self.save_stats_batch((epoch - 1) * train_num_batches + i)
+                    if self.cf.normalize_loss:
+                        self.stats.train.loss = train_loss.avg
+                    else:
+                        self.stats.train.loss = train_loss.avg
 
-                    # Update epoch messages
-                    self.update_epoch_messages(epoch_bar, global_bar, train_num_batches,epoch, i)
+                    if not self.cf.debug:
+                        # Save stats
+                        self.save_stats_batch((epoch - 1) * train_num_batches + i)
+
+                        # Update epoch messages
+                        self.update_epoch_messages(epoch_bar, global_bar, train_num_batches, epoch, i)
 
                 # Save stats
                 self.stats.train.conf_m = confm_list
                 self.compute_stats(np.asarray(confm_list),train_loss)
                 self.save_stats_epoch(epoch)
-                self.logger_stats.train_json.write(self.stats.train, epoch)
+                self.logger_stats.write_stat(self.stats.train, epoch, os.path.join(self.cf.train_json_path,
+                                                                                'train_epoch_' + str(epoch) + '.json'))
 
                 # Validate epoch
-                self.validate_epoch(valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar)
+                self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, global_bar)
 
                 # Update scheduler
-                if scheduler is not None:
-                    scheduler.step(self.stats.val.loss)
+                if self.model.scheduler is not None:
+                    self.model.scheduler.step(self.stats.val.loss)
 
-                # Saving model if needed
-                save = self.model.net.save(self.stats)
-                if save:
-                    self.logger_stats.best_json.override_file()
-                    self.logger_stats.best_json.write(self.stats.train, epoch)
-                    self.logger_stats.best_json.write(self.stats.val, epoch)
+                # Saving model if score improvement
+                new_best = self.model.save(self.stats)
+                if new_best:
+                    self.logger_stats.write_best_stats(self.stats, epoch, self.cf.best_json_file)
 
                 # Update display values
-                self.update_messages(epoch, epoch_time)
+                self.update_messages(epoch, epoch_time, new_best)
 
                 if self.stop:
                     return
 
             # Save model without training
             if self.cf.epochs == 0:
-                self.model.save_model(self.model.net)
+                self.model.save_model()
 
         def save_stats_epoch(self, epoch):
             # Save logger
@@ -150,23 +158,44 @@ class SimpleTrainer(object):
             if batch is not None:
                 self.writer.add_scalar('losses/batch', self.stats.train.loss, batch)
 
+        def compute_gradients(self):
+
+            #list_outs = np.asarray([self.model.net(self.inputs) for run_dropout in range(10)])
+            outs = None
+            for run_dropout in range(10):
+                predict = self.model.net(self.inputs)
+                n,w,h,c = predict.size()
+                predict = predict.view(1,n,w,h,c)
+                if  outs is None:
+                    outs = predict
+                else:
+                #			print outs.size()
+                #			print predict.size()
+                    outs = torch.cat((outs,predict),0)
+            self.loss = self.model.loss(outs, self.labels)
+            self.loss.backward()
+            self.model.optimizer.step()
+
+            print [p.grad.data.numpy() * 2 for p in list(self.model.net.parameters())]
+
         def compute_stats(self, confm_list, train_loss):
             TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
             mean_accuracy = compute_accuracy(TP_list, TN_list, FP_list, FN_list)
             self.stats.train.acc = np.nanmean(mean_accuracy)
             self.stats.train.loss = train_loss.avg
 
-        def validate_epoch(self,valid_set, valid_loader, criterion, early_Stopping, epoch, global_bar):
+        def validate_epoch(self,valid_set, valid_loader, early_Stopping, epoch, global_bar):
 
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
 
-                self.validator.start(criterion, valid_set, valid_loader, 'val_epoch', epoch, global_bar=global_bar)
+                self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
-                    early_Stopping.check(self.stats.train.loss, self.stats.val.loss, self.stats.val.mIoU, self.stats.val.acc)
+                    early_Stopping.check(self.stats.train.loss, self.stats.val.loss, self.stats.val.mIoU,
+                                         self.stats.val.acc)
                     if early_Stopping.stop == True:
                         self.stop=True
                 # Set model in training mode
@@ -179,7 +208,8 @@ class SimpleTrainer(object):
             self.logger_stats.write('\t Epoch step finished: %ds \n' % (epoch_time))
 
             # Compute best stats
-            self.msg.msg_stats_last = '\nLast epoch: acc = %.2f, loss = %.5f\n' % (100 * self.stats.val.acc, self.stats.val.loss)
+            self.msg.msg_stats_last = '\nLast epoch: acc = %.2f, loss = %.5f\n' % (100 * self.stats.val.acc,
+                                                                                   self.stats.val.loss)
             if self.best_acc < self.stats.val.acc:
                 self.msg.msg_stats_best = 'Best case: epoch = %d, acc = %.2f, loss = %.5f\n' % (
                 epoch, 100 * self.stats.val.acc, self.stats.val.loss)
@@ -194,7 +224,8 @@ class SimpleTrainer(object):
             # Update progress bar
             epoch_bar.set_msg('loss = %.5f' % self.stats.train.loss)
             self.msg.last_str = epoch_bar.get_message(step=True)
-            global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + self.msg.msg_stats_best)
+            global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + \
+                               self.msg.msg_stats_best)
             global_bar.update()
 
             # writer.add_scalar('train_loss', train_loss.avg, curr_iter)
@@ -215,14 +246,14 @@ class SimpleTrainer(object):
             self.msg = msg
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path, 'validation'))
 
-        def start(self, criterion, valid_set, valid_loader, mode='val', epoch=None, global_bar=None):
+        def start(self, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None):
             confm_list = np.zeros((self.cf.num_classes,self.cf.num_classes))
 
             val_loss = AverageMeter()
 
             # Initialize epoch progress bar
             val_num_batches = math.ceil(valid_set.num_images / float(self.cf.valid_batch_size))
-            prev_msg = '\nValidation estimated time...\n'
+            prev_msg = '\n' + mode + ' estimated time...\n'
             bar = ProgressBar(val_num_batches, lenBar=20)
             bar.set_prev_msg(prev_msg)
             bar.update(show=False)
@@ -239,14 +270,36 @@ class SimpleTrainer(object):
                 outputs = self.model.net(inputs)
                 predictions = outputs.data.max(1)[1].cpu().numpy()
 
+	        outs = None
+     	        for run_dropout in range(10):
+			predict = self.model.net(inputs)
+			n,w,h,c = predict.size()
+			predict = predict.view(1,n,w,h,c)
+			if  outs is None:
+				outs = predict
+			else:
+	#			print outs.size()
+	#			print predict.size()
+				outs = torch.cat((outs,predict),0)
+
                 # Compute batch stats
-                val_loss.update(criterion(outputs, gts).data[0] / n_images, n_images)
-                confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,self.cf.void_class)
+                val_loss.update(self.model.loss(outs, gts).data[0] / n_images, n_images)
+                confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
+                                                 self.cf.void_class)
                 confm_list = map(operator.add, confm_list, confm)
 
                 # Save epoch stats
                 self.stats.val.conf_m = confm_list
-                self.stats.val.loss = val_loss.avg / (w * h * c)
+                if not self.cf.normalize_loss:
+                    self.stats.val.loss = val_loss.avg
+                else:
+                    self.stats.val.loss = val_loss.avg
+
+                # Save predictions and generate overlaping
+                self.update_tensorboard(inputs.cpu(),gts.cpu(),
+                                        predictions,epoch,range(vi*self.cf.valid_batch_size,
+                                                                vi*self.cf.valid_batch_size+np.shape(predictions)[0]),
+                                                                valid_set.num_images)
 
                 # Update messages
                 self.update_msg(bar, global_bar)
@@ -256,12 +309,17 @@ class SimpleTrainer(object):
 
             # Save stats
             self.save_stats(epoch)
-            if mode == 'val_epoch':
-                self.logger_stats.val_train_json.write(self.stats.val, epoch)
-            elif mode == 'val':
-                self.logger_stats.val_json.write(self.stats.val, epoch)
-            elif mode == 'test':
-                self.logger_stats.test_json.write(self.stats.test, epoch)
+            if mode == 'Epoch Validation':
+                self.logger_stats.write_stat(self.stats.train, epoch,
+                                            os.path.join(self.cf.train_json_path,'valid_epoch_' + str(epoch) + '.json'))
+            elif mode == 'Validation':
+                self.logger_stats.write_stat(self.stats.val, epoch, self.cf.val_json_file)
+            elif mode == 'Test':
+                self.logger_stats.write_stat(self.stats.test, epoch, self.cf.test_json_file)
+
+        def update_tensorboard(self,inputs,gts,predictions,epoch,indexes,val_len):
+            pass
+
 
         def update_msg(self, bar, global_bar):
             if global_bar==None:
@@ -269,7 +327,8 @@ class SimpleTrainer(object):
                 bar.update()
             else:
                 self.msg.eval_str = '\n' + bar.get_message(step=True)
-                global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + self.msg.msg_stats_best + self.msg.eval_str)
+                global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + \
+                                   self.msg.msg_stats_best + self.msg.eval_str)
                 global_bar.update()
 
         def compute_stats(self, confm_list, val_loss):
@@ -285,7 +344,6 @@ class SimpleTrainer(object):
                 self.logger_stats.write('[epoch %d], [val loss %.5f], [acc %.2f] \n' % (
                     epoch, self.stats.val.loss, 100*self.stats.val.acc))
                 self.logger_stats.write('---------------------------------------------------------------- \n')
-                self.logger_stats.save_json(self.stats.val, epoch)
             else:
                 self.logger_stats.write('----------------- Scores summary -------------------- \n')
                 self.logger_stats.write('[val loss %.5f], [acc %.2f] \n' % (

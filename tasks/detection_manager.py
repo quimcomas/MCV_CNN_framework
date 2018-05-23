@@ -6,10 +6,7 @@ from PIL import Image
 import cv2 as cv
 
 sys.path.append('../')
-from utils.tools import confm_metrics2image
-from metrics.metrics import compute_mIoU, compute_accuracy_segmentation, extract_stats_from_confm
 from simple_trainer_manager import SimpleTrainer
-from utils.save_images import save_img
 
 class SemanticSegmentation_Manager(SimpleTrainer):
     def __init__(self, cf, model):
@@ -20,15 +17,15 @@ class SemanticSegmentation_Manager(SimpleTrainer):
             super(SemanticSegmentation_Manager.train, self).__init__(logger_stats, model, cf, validator, stats, msg)
             if self.cf.resume_experiment:
                 self.msg.msg_stats_best = 'Best case [%s]: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
-                    self.cf.save_condition, self.model.best_stats.epoch, 100 * self.model.best_stats.val.mIoU,
-                    100 * self.model.best_stats.val.acc, self.model.best_stats.val.loss)
+                    self.cf.save_condition, self.model.net.best_stats.epoch, 100 * self.model.net.best_stats.val.mIoU,
+                    100 * self.model.net.best_stats.val.acc, self.model.net.best_stats.val.loss)
 
         def validate_epoch(self, valid_set, valid_loader, early_Stopping, epoch, global_bar):
 
             if valid_set is not None and valid_loader is not None:
                 # Set model in validation mode
                 self.model.net.eval()
-
+                self.model.net.training = False
                 self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
 
                 # Early stopping checking
@@ -39,7 +36,11 @@ class SemanticSegmentation_Manager(SimpleTrainer):
                         self.stop = True
 
                 # Set model in training mode
+                self.model.net.training = True
                 self.model.net.train()
+
+        def compute_gradients(self):
+            pass
 
         def update_messages(self, epoch, epoch_time, new_best):
             # Update logger
