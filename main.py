@@ -1,4 +1,3 @@
-import argparse
 import time
 from tasks.semanticSegmentator_manager import SemanticSegmentation_Manager
 from tasks.classification_manager import Classification_Manager
@@ -12,28 +11,9 @@ from dataloader.dataloader_builder import Dataloader_Builder
 
 def main():
     start_time = time.time()
-    # Input arguments
-    parser = argparse.ArgumentParser(description="TensorFlow framework for Semantic Segmentation")
-    parser.add_argument("--config_file",
-                        type=str,
-                        default='config/configFile.py',
-                        help="configuration file path")
-
-    parser.add_argument("--exp_name",
-                        type=str,
-                        default='Sample',
-                        help="Experiment name")
-
-    parser.add_argument("--exp_folder",
-                        type=str,
-                        default='/home/jlgomez/Experiments/',
-                        help="Experiment folder path")
-
-    args = parser.parse_args()
-
     # Prepare configutation
     print ('Loading configuration ...')
-    config = Configuration(args.config_file, args.exp_name, args.exp_folder)
+    config = Configuration()
     cf = config.Load()
     # Enable log file
     logger_debug = Logger(cf.log_file_debug)

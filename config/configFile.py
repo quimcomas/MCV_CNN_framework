@@ -26,7 +26,7 @@ loss_type                   = 'cross_entropy_segmentation' # options: ['cross_en
 # General parameters
 
 train_samples               = 50 #-1 uses all the data available inside the dataset files
-valid_samples               = -1 #-1 uses all the data available inside the dataset files
+valid_samples               = 10 #-1 uses all the data available inside the dataset files
 test_samples                = 10 #-1 uses all the data available inside the dataset files
 train_batch_size            = 8
 valid_batch_size            = 1
