@@ -1,9 +1,11 @@
 import imp
-import yaml
+from ruamel import yaml
+# import yaml
 import os
 import numpy as np
 import argparse
 from easydict import EasyDict as edict
+import configparser
 
 class Configuration():
     def __init__(self):
@@ -16,8 +18,16 @@ class Configuration():
         if self.args.config_file is not None:
             # Read a user specific config File
             # cf = imp.load_source('config', self.args.config_file)
+            # cf = configparser.ConfigParser()
+            # cf.read(self.args.config_file)
+            # print(cf)
+            # cf = edict(cf)
             with open(self.args.config_file, 'r') as f:
-                cf = edict(yaml.load(f))
+                cf = yaml.load(f)
+                # print(cf.crop_train)
+                # print(type(cf.crop_train))
+                # print(len(cf.crop_train))
+                cf = edict(cf)
         else:
             # Read the deafault config file
             # cf = imp.load_source('config', 'config/configFile.py')
@@ -37,20 +47,22 @@ class Configuration():
         cf.val_json_file = os.path.join(cf.exp_folder, "json_stats/val_stats.json")
         cf.test_json_file = os.path.join(cf.exp_folder, "json_stats/test_stats.json")
         cf.best_json_file = os.path.join(cf.exp_folder, "json_stats/best_model_stats.json")
+        # Copy config file TODO: create a file saver for parse config
+        # shutil.copyfile(cf.config_file, os.path.join(cf.exp_folder, "config.py"))
 
-        if cf.predict_path_output is None:
+        if cf.predict_path_output is None or cf.predict_path_output == 'None':
             cf.predict_path_output = os.path.join(cf.exp_folder,'predictions/')
             if not os.path.exists(cf.predict_path_output):
                 os.makedirs(cf.predict_path_output)
         cf.original_size = cf.size_image_test
-        if cf.input_model_path is None:
+        if cf.input_model_path == 'None':
             cf.input_model_path = os.path.join(cf.exp_folder, cf.model_name + '.pth')
-        if cf.output_model_path is None:
+        if cf.output_model_path == 'None':
             cf.output_model_path = cf.exp_folder
         else:
             if not os.path.exists(cf.output_model_path):
                 os.makedirs(cf.output_model_path)
-        if cf.map_labels is not None:
+        if cf.map_labels != 'None':
             cf.map_labels = {value: idx for idx, value in enumerate(cf.map_labels)}
         # if cf.pretrained_model is None:
         #     cf.pretrained_model = 'None'
@@ -60,26 +72,27 @@ class Configuration():
             cf.basic_pretrained_model = True
         else:
             cf.basic_pretrained_model = False
-        if cf.basic_models_path is None:
+        if cf.basic_models_path == 'None':
             cf.basic_models_path = './pretrained_model/'
         return cf
 
     def Parse_args(self):
         # Input arguments
-        parser = argparse.ArgumentParser(description="Pytorch framework for Semantic Segmentation, Classification "
-                                                     "and Object Detection")
+        parser = argparse.ArgumentParser(description="Pytorch framework for Semantic segmentation, classification "
+                                                     "and detection")
         parser.add_argument("--config_file",
                             type=str,
+                            default=None,
                             help="configuration YALM file path")
 
         parser.add_argument("--exp_name",
                             type=str,
-                            required=True,
+                            default='Sample',
                             help="Experiment name")
 
         parser.add_argument("--exp_folder",
                             type=str,
-                            required=True,
+                            default='/home/jlgomez/Experiments/',
                             help="Experiment folder path")
 
         parser.add_argument("--problem_type",
@@ -210,6 +223,9 @@ class Configuration():
                             help="File that contains the ground truth from test images")
 
         parser.add_argument('--labels', nargs='+', type=str, help='Specify list of class labels: e.g. '
+                                                                  '--labels class1 class2 class3 ...'
+                                                                  'e.g. --crop_train X Y')
+        parser.add_argument('--map_labels', nargs='+', type=str, help='Specify list of class labels: e.g. '
                                                                   '--labels class1 class2 class3 ...'
                                                                   'e.g. --crop_train X Y')
         parser.add_argument("--num_classes",
@@ -391,8 +407,11 @@ class Configuration():
         if self.args.test_gt_txt is not None:
             cf.test_gt_txt = self.args.test_gt_txt
         if self.args.labels is not None:
+            self.args.labels=self.args.labels[0].split(',')
             cf.labels = self.args.labels
-           # cf.map_labels = self.args.
+        if self.args.map_labels is not None:
+            self.args.map_labels=self.args.map_labels[0].split(',')
+            cf.map_labels = self.args.map_labels
         if self.args.num_classes is not None:
             cf.num_classes = self.args.num_classes
         if self.args.shuffle is not None:

@@ -27,6 +27,7 @@ class fromFileDatasetClassification(Data_loader):
         if cf.map_labels is None:
             self.gt = [int(line) for line in lines]
         else:
+            print(cf.map_labels)
             self.gt = [int(cf.map_labels[line]) for line in lines]
 
         if len(self.gt) != len(self.image_names):
