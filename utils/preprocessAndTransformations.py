@@ -46,8 +46,8 @@ class PrintInput(object):
 
 
 class rescale(object):
-    def __init__(self, rescale):
-        self.rescale = rescale
+    def __init__(self):
+        self.rescale = 1/255.
 
     def __call__(self, image):
         return image * self.rescale
@@ -71,8 +71,8 @@ class std_norm(object):
 class preproces_input(object):
     def __init__(self, cf):
         self.cf = cf
-        if self.cf.rescale is not None:
-            self.rescale = rescale(self.cf.rescale)
+        if self.cf.rescale:
+            self.rescale = rescale()
         if self.cf.mean is not None:
             self.mean = mean_norm(self.cf.mean)
         if self.cf.std is not None:
