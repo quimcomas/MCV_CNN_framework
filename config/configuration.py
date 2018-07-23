@@ -50,19 +50,19 @@ class Configuration():
         # Copy config file TODO: create a file saver for parse config
         # shutil.copyfile(cf.config_file, os.path.join(cf.exp_folder, "config.py"))
 
-        if cf.predict_path_output is None or cf.predict_path_output == 'None':
+        if cf.predict_path_output is None or cf.predict_path_output is None:
             cf.predict_path_output = os.path.join(cf.exp_folder,'predictions/')
             if not os.path.exists(cf.predict_path_output):
                 os.makedirs(cf.predict_path_output)
         cf.original_size = cf.size_image_test
-        if cf.input_model_path == 'None':
+        if cf.input_model_path is None:
             cf.input_model_path = os.path.join(cf.exp_folder, cf.model_name + '.pth')
-        if cf.output_model_path == 'None':
+        if cf.output_model_path is None:
             cf.output_model_path = cf.exp_folder
         else:
             if not os.path.exists(cf.output_model_path):
                 os.makedirs(cf.output_model_path)
-        if cf.map_labels != 'None':
+        if cf.map_labels is not None:
             cf.map_labels = {value: idx for idx, value in enumerate(cf.map_labels)}
         # if cf.pretrained_model is None:
         #     cf.pretrained_model = 'None'
@@ -72,7 +72,7 @@ class Configuration():
             cf.basic_pretrained_model = True
         else:
             cf.basic_pretrained_model = False
-        if cf.basic_models_path == 'None':
+        if cf.basic_models_path is None:
             cf.basic_models_path = './pretrained_model/'
         return cf
 

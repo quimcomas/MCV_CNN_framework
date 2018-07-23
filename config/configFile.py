@@ -64,12 +64,12 @@ grayscale                   = False #Use this option to convert to rgb a grascal
 
 # Dataset properties
 
-train_images_txt            = '/home/jlgomez/Datasets/Splits/cityscapes_train_images.txt'
-train_gt_txt                = '/home/jlgomez/Datasets/Splits/cityscapes_train_gt.txt'
-valid_images_txt            = '/home/jlgomez/Datasets/Splits/cityscapes_valid_images.txt'
-valid_gt_txt                = '/home/jlgomez/Datasets/Splits/cityscapes_valid_gt.txt'
-test_images_txt             = '/home/jlgomez/Datasets/Splits/cityscapes_valid_images.txt'
-test_gt_txt                 = '/home/jlgomez/Datasets/Splits/cityscapes_valid_gt.txt'
+train_images_txt            = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images.txt'
+train_gt_txt                = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images_gt.txt'
+valid_images_txt            = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images.txt'
+valid_gt_txt                = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images_gt.txt'
+test_images_txt             = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images.txt'
+test_gt_txt                 = '/datatmp/Datasets/segmentation/cityscapes/cityscapes_images_gt.txt'
 
 labels                       = ['road','sidewalk','building','wall','fence','pole','traffic light','traffic, sign',
                                 'vegetation','terrain','sky','person','rider','car','truck','bus','train',

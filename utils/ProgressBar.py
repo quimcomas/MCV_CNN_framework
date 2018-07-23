@@ -52,13 +52,13 @@ class ProgressBar:
 
                 msg_list = msg_endl
                 msg_lens = len(msg_list)
-                # msg_list, msg_lens = self.__split_msg(msg_endl)
-                # self.__remove_last_msg()
+                msg_list, msg_lens = self.__split_msg(msg_endl)
+                self.__remove_last_msg()
 
                 for msg in msg_list:
-                    # sys.stdout.write(msg)
-                    print(msg)
-                # sys.stdout.flush()
+                    sys.stdout.write(msg)
+                    # print(msg)
+                sys.stdout.flush()
                 self.__lastLens = msg_lens
 
                 if self.__step == self.__nSteps:

@@ -1,7 +1,7 @@
 # Problem type
-problem_type: 'segmentation' # Option: ['segmentation','classification']
+problem_type: 'classification' # Option: ['segmentation','classification']
 # Model
-model_type: 'RPN'   # Options: ['DenseNetFCN', 'FCN8']
+model_type: 'VGG'   # Options: ['DenseNetFCN', 'FCN8']
     ### DenseNetFCN options ####
 model_blocks: 5               # Number of block densenetFCN_Custom only
 model_layers: 4               # Number of layers per block densenetFCN_Custom only

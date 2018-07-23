@@ -9,7 +9,7 @@ from models.networks.segmentation.FCN8 import FCN8
 from models.networks.segmentation.FCN8AtOnce import FCN8AtOnce
 from models.networks.segmentation.FCdenseNetTorch import FCDenseNet
 from models.networks.classification.VGG16 import VGG16
-from models.networks.detection.rpn import RPN
+# from models.networks.detection.rpn import RPN
 from models.loss.loss_builder import Loss_Builder
 from models.optimizer.optimizer_builder import Optimizer_builder
 from models.scheduler.scheduler_builder import scheduler_builder
@@ -40,8 +40,8 @@ class Model_builder():
             self.net = FCN8(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         elif self.cf.model_type.lower() == 'fcn8atonce':
             self.net = FCN8AtOnce(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
-        elif self.cf.model_type.lower() == 'rpn':
-            self.net = RPN(self.cf, 512)
+        # elif self.cf.model_type.lower() == 'rpn':
+        #     self.net = RPN(self.cf, 512)
         elif self.cf.model_type.lower() == 'vgg16':
             self.net = VGG16(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         else:
