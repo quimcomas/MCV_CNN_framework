@@ -13,8 +13,11 @@ from models.loss.detection.smooth_l1_loss import SmoothL1Loss
 
 class RPN(Net):
     """ region proposal network """
-    def __init__(self, cf, din):
+    def __init__(self, cf, din, pretrained=False, net_name='rpn'):
         super(RPN, self).__init__(cf)
+        self.url = ''
+        self.pretrained = pretrained
+        self.net_name = net_name
 
         self.loss = SmoothL1Loss(cf)
         
