@@ -20,6 +20,7 @@ class RPN(Net):
         
         self.din = din  # get depth of input feature map, e.g., 512
 
+
         # define the convrelu layers processing input feature map
         self.RPN_Conv = nn.Conv2d(self.din, 512, 3, 1, 1, bias=True)
 

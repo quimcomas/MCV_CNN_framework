@@ -48,6 +48,7 @@ class Net(nn.Module):
         return torch.from_numpy(weight).float()
 
     def load_basic_weights(self):
+        print("load basic weights")
         if not os.path.exists(self.cf.basic_models_path):
             os.makedirs(self.cf.basic_models_path)
         filename = os.path.join(self.cf.basic_models_path, 'basic_'+ self.net_name.lower() +'.pth')
@@ -56,8 +57,13 @@ class Net(nn.Module):
 
     def download_if_not_exist(self, filename):
         # Download the file if it does not exist
+        print(self.url)
+        print(not os.path.isfile(filename))
         if not os.path.isfile(filename) and self.url is not None:
+            print("downloading file")
             wget.download(self.url, filename)
+        else:
+            print("NOT downloading file")
 
     def restore_weights(self, filename):
         print('\t Restoring weight from ' + filename)

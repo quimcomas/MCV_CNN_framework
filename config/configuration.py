@@ -1,9 +1,11 @@
 import imp
-import yaml
+from ruamel import yaml
+# import yaml
 import os
 import numpy as np
 import argparse
 from easydict import EasyDict as edict
+import configparser
 
 class Configuration():
     def __init__(self):
@@ -16,8 +18,16 @@ class Configuration():
         if self.args.config_file is not None:
             # Read a user specific config File
             # cf = imp.load_source('config', self.args.config_file)
+            # cf = configparser.ConfigParser()
+            # cf.read(self.args.config_file)
+            # print(cf)
+            # cf = edict(cf)
             with open(self.args.config_file, 'r') as f:
-                cf = edict(yaml.load(f))
+                cf = yaml.load(f)
+                # print(cf.crop_train)
+                # print(type(cf.crop_train))
+                # print(len(cf.crop_train))
+                cf = edict(cf)
         else:
             # Read the deafault config file
             # cf = imp.load_source('config', 'config/configFile.py')
@@ -40,7 +50,7 @@ class Configuration():
         # Copy config file TODO: create a file saver for parse config
         # shutil.copyfile(cf.config_file, os.path.join(cf.exp_folder, "config.py"))
 
-        if cf.predict_path_output == 'None':
+        if cf.predict_path_output is None or cf.predict_path_output == 'None':
             cf.predict_path_output = os.path.join(cf.exp_folder,'predictions/')
             if not os.path.exists(cf.predict_path_output):
                 os.makedirs(cf.predict_path_output)
@@ -213,6 +223,9 @@ class Configuration():
                             help="File that contains the ground truth from test images")
 
         parser.add_argument('--labels', nargs='+', type=str, help='Specify list of class labels: e.g. '
+                                                                  '--labels class1 class2 class3 ...'
+                                                                  'e.g. --crop_train X Y')
+        parser.add_argument('--map_labels', nargs='+', type=str, help='Specify list of class labels: e.g. '
                                                                   '--labels class1 class2 class3 ...'
                                                                   'e.g. --crop_train X Y')
         parser.add_argument("--num_classes",
@@ -394,8 +407,11 @@ class Configuration():
         if self.args.test_gt_txt is not None:
             cf.test_gt_txt = self.args.test_gt_txt
         if self.args.labels is not None:
+            self.args.labels=self.args.labels[0].split(',')
             cf.labels = self.args.labels
-           # cf.map_labels = self.args.
+        if self.args.map_labels is not None:
+            self.args.map_labels=self.args.map_labels[0].split(',')
+            cf.map_labels = self.args.map_labels
         if self.args.num_classes is not None:
             cf.num_classes = self.args.num_classes
         if self.args.shuffle is not None:

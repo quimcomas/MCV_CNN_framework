@@ -95,6 +95,10 @@ class applyCrop(object):
     def __call__(self, img, mask):
         if self.cf.crop_train is not None:
             h, w = np.shape(img)[0:2]
+            print(self.cf.crop_train)
+            print(type(self.cf.crop_train))
+            print(len(self.cf.crop_train))
+            exit(-1)
             th, tw = self.cf.crop_train
             if w == tw and h == th:
                 return img, mask

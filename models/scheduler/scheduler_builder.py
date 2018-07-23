@@ -10,7 +10,9 @@ class scheduler_builder:
     	elif cf.scheduler == 'Step':
     		scheduler = lr_scheduler.StepLR(optimizer, step_size=cf.step_size, gamma=cf.decay, last_epoch=-1)
     	elif cf.scheduler == 'MultiStep':
-    		scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=cf.milestone, gamma=cf.decay, last_epoch=-1)
+			print(cf.decay)
+			print(type(cf.decay))
+			scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=cf.milestone, gamma=cf.decay, last_epoch=-1)
     	elif cf.scheduler == 'Exponential':
     		scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=cf.decay, last_epoch=-1)
         elif cf.scheduler == None or cf.scheduler == 'None':

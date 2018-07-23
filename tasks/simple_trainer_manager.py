@@ -100,7 +100,7 @@ class SimpleTrainer(object):
                     self.compute_gradients()
 
                     # Compute batch stats
-                    train_loss.update(self.loss.data[0], N)
+                    train_loss.update(float(self.loss.cpu().data[0]), N)
                     confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
@@ -159,30 +159,15 @@ class SimpleTrainer(object):
                 self.writer.add_scalar('losses/batch', self.stats.train.loss, batch)
 
         def compute_gradients(self):
-
-            #list_outs = np.asarray([self.model.net(self.inputs) for run_dropout in range(10)])
-            outs = None
-            for run_dropout in range(10):
-                predict = self.model.net(self.inputs)
-                n,w,h,c = predict.size()
-                predict = predict.view(1,n,w,h,c)
-                if  outs is None:
-                    outs = predict
-                else:
-                #			print outs.size()
-                #			print predict.size()
-                    outs = torch.cat((outs,predict),0)
-            self.loss = self.model.loss(outs, self.labels)
+            self.loss = self.model.loss(self.outputs, self.labels)
             self.loss.backward()
             self.model.optimizer.step()
-
-            print [p.grad.data.numpy() * 2 for p in list(self.model.net.parameters())]
 
         def compute_stats(self, confm_list, train_loss):
             TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
             mean_accuracy = compute_accuracy(TP_list, TN_list, FP_list, FN_list)
             self.stats.train.acc = np.nanmean(mean_accuracy)
-            self.stats.train.loss = train_loss.avg
+            self.stats.train.loss = float(train_loss.avg.cpu().data)
 
         def validate_epoch(self,valid_set, valid_loader, early_Stopping, epoch, global_bar):
 
@@ -270,20 +255,20 @@ class SimpleTrainer(object):
                 outputs = self.model.net(inputs)
                 predictions = outputs.data.max(1)[1].cpu().numpy()
 
-	        outs = None
-     	        for run_dropout in range(10):
-			predict = self.model.net(inputs)
-			n,w,h,c = predict.size()
-			predict = predict.view(1,n,w,h,c)
-			if  outs is None:
-				outs = predict
-			else:
-	#			print outs.size()
-	#			print predict.size()
-				outs = torch.cat((outs,predict),0)
+	        # outs = None
+     # 	        for run_dropout in range(10):
+	# 		predict = self.model.net(inputs)
+	# 		n,w,h,c = predict.size()
+	# 		predict = predict.view(1,n,w,h,c)
+	# 		if  outs is None:
+	# 			outs = predict
+	# 		else:
+	# #			print outs.size()
+	# #			print predict.size()
+	# 			outs = torch.cat((outs,predict),0)
 
                 # Compute batch stats
-                val_loss.update(self.model.loss(outs, gts).data[0] / n_images, n_images)
+                val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
                 confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
                                                  self.cf.void_class)
                 confm_list = map(operator.add, confm_list, confm)
