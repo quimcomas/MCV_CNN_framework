@@ -26,14 +26,18 @@ The following repository contains a functional framework to perform different de
   --exp_folder [path_to_save_experiment] --config_file [path_to_config_file]
   You can define default values to this input arguments in main.py
   
- ### Requirements
+### Requirements
  - Python 2.7
- - PyTorch 0.3.0
+ - PyTorch 0.3.0 (https://pytorch.org/)
  - Scipy 1.0.0
  - Numpy 1.13.3
  - OpenCV 3.0
  - wget
  - TensorboardX (https://github.com/lanpa/tensorboard-pytorch)
+ ### Requirements Installation
+```
+$ pip install requirements.txt -r --user
+```
   
 ### Actual limitations
 - Datasets are defined in txt files, one for images and gt files for each instance of training validation and test. The txt file must contain the path to the image and have the same line order per image respect to the gt file. This files path must be defined in the ConfigFile.py
