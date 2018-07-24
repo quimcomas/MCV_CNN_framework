@@ -33,7 +33,7 @@ The following repository contains a functional framework to perform different de
  - Numpy 1.13.3
  - OpenCV 3.0
  - wget
- - TensorboardX (https://github.com/lanpa/tensorboard-pytorch)
+ - TensorboardX
  ### Requirements Installation
 ```
 $ pip install requirements.txt -r --user
