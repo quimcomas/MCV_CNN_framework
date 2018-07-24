@@ -7,6 +7,7 @@ The following repository contains a functional framework to perform different de
     - Model: VGG16
 - Semantic segmentation (functional)
     - Model: FCN8, DenseNetFCN (Tiramisú)
+- Object Detection (not implemented yet)
 - Domain Adaptation (not implemented yet)
 
 ### Functionalities implemented:
@@ -24,7 +25,7 @@ The following repository contains a functional framework to perform different de
 - Configure the configuration file in config/ConfigFile.py
 - Run code using: CUDA_VISIBLE_DEVICES=[gpu_number] python main.py --exp_name [experiment_name] 
   --exp_folder [path_to_save_experiment] --config_file [path_to_config_file]
-  You can define default values to this input arguments in main.py
+  You can also add any variable from the config file, just using --[var name] [value], the parameter given by argument will overwrite the value from the config file.
   
  ### Requirements
  - Python 2.7

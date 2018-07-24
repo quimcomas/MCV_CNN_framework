@@ -16,7 +16,6 @@ def main():
     logger_debug = Logger(cf.log_file_debug)
 
     logger_debug.write('\n ---------- Init experiment: ' + cf.exp_name + ' ---------- \n')
-
     # Model building
     logger_debug.write('- Building model: ' + cf.model_name + ' <--- ')
     model = Model_builder(cf)

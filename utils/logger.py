@@ -3,10 +3,13 @@ import json
 # Save the printf to a log file
 class Logger(object):
     def __init__(self, log_file):
-        self.log = open(log_file, "w")
+        self.file = log_file
+        log = open(log_file, 'w')
+        log.close()
 
     def write(self, message):
-        self.log.write(message)
+        with open(self.file, 'a') as log:
+            log.write(message)
 
     def create_dict(self, stats, epoch):
         if epoch is None:
