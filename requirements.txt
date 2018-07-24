@@ -1,0 +1,10 @@
+numpy
+easydict
+scipy
+matplotlib
+opencv-python
+scikit-image
+tensorboardx
+wget
+configparser
+ruamel.yaml
