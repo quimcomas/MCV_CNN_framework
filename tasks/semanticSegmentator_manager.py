@@ -134,12 +134,12 @@ class SemanticSegmentation_Manager(SimpleTrainer):
         def __init__(self, logger_stats, model, cf):
             super(SemanticSegmentation_Manager.predict, self).__init__(logger_stats, model, cf)
 
-        def write_results(self,predictions, img_name):
-                path = os.path.join(self.cf.predict_path_output, img_name[0])
-                predictions = predictions[0]
-                predictions = Image.fromarray(predictions.astype(np.uint8))
-                if self.cf.resize_image_test is not None:
-                    predictions = predictions.resize((self.cf.original_size[1],
-                                                      self.cf.original_size[0]), resample=Image.BILINEAR)
-                predictions = np.array(predictions)
-                cv.imwrite(path, predictions)
+        def write_results(self, predictions, img_name, img_shape):
+            path = os.path.join(self.cf.predict_path_output, img_name[0])
+            predictions = predictions[0]
+            predictions = Image.fromarray(predictions.astype(np.uint8))
+            if self.cf.resize_image_test is not None:
+                predictions = predictions.resize((img_shape[1],
+                                                  img_shape[0]), resample=Image.BILINEAR)
+            predictions = np.array(predictions)
+            cv.imwrite(path, predictions)

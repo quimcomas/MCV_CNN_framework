@@ -70,6 +70,7 @@ class Data_loader(Dataset):
     def load_img(self, path, resize=None, grayscale=False, order=1):
         # Load image
         img = io.imread(path)
+        shape = img.shape
         if resize is not None:
             img = skimage.transform.resize(img, resize, order=order,
                                            preserve_range=True, mode='reflect')
@@ -80,7 +81,7 @@ class Data_loader(Dataset):
         elif len(img.shape) > 2 and img.shape[2] == 3 and grayscale:
             img = rgb2gray(img)
         # Return image
-        return img
+        return img, shape
 
     # Checks if a file is an image
     def has_valid_extension(self, fname, white_list_formats={'png', 'jpg', 'jpeg',

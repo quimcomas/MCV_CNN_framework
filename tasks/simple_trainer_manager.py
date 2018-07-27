@@ -248,30 +248,19 @@ class SimpleTrainer(object):
                 # Read data
                 inputs, gts = data
                 n_images,w,h,c = inputs.size()
-                inputs = Variable(inputs, volatile=True).cuda()
-                gts = Variable(gts, volatile=True).cuda()
+                inputs = Variable(inputs).cuda()
+                gts = Variable(gts).cuda()
 
                 # Predict model
-                outputs = self.model.net(inputs)
-                predictions = outputs.data.max(1)[1].cpu().numpy()
+                with torch.no_grad():
+                    outputs = self.model.net(inputs)
+                    predictions = outputs.data.max(1)[1].cpu().numpy()
 
-	        # outs = None
-     # 	        for run_dropout in range(10):
-	# 		predict = self.model.net(inputs)
-	# 		n,w,h,c = predict.size()
-	# 		predict = predict.view(1,n,w,h,c)
-	# 		if  outs is None:
-	# 			outs = predict
-	# 		else:
-	# #			print outs.size()
-	# #			print predict.size()
-	# 			outs = torch.cat((outs,predict),0)
-
-                # Compute batch stats
-                val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
-                confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
-                                                 self.cf.void_class)
-                confm_list = map(operator.add, confm_list, confm)
+                    # Compute batch stats
+                    val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
+                    confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
+                                                     self.cf.void_class)
+                    confm_list = map(operator.add, confm_list, confm)
 
                 # Save epoch stats
                 self.stats.val.conf_m = confm_list
@@ -346,16 +335,16 @@ class SimpleTrainer(object):
             self.model.net.eval()
 
             for vi, data in enumerate(dataloader):
-                inputs, img_name = data
+                inputs, img_name, img_shape = data
 
-                inputs = Variable(inputs, volatile=True).cuda()
+                inputs = Variable(inputs).cuda()
+                with torch.no_grad():
+                    outputs = self.model.net(inputs)
+                    predictions = outputs.data.max(1)[1].cpu().numpy()
 
-                outputs = self.model.net(inputs)
-                predictions = outputs.data.max(1)[1].cpu().numpy()
+                    self.write_results(predictions, img_name, img_shape)
 
-                self.write_results(predictions,img_name)
-
-                self.logger_stats.write('%d / %d \n' % (vi + 1, len(dataloader)))
-
+                # self.logger_stats.write('%d / %d \n' % (vi + 1, len(dataloader)))
+                print('%d / %d' % (vi + 1, len(dataloader)))
         def write_results(self,predictions, img_name):
-                pass
+            pass

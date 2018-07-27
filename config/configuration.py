@@ -23,7 +23,7 @@ class Configuration():
             # print(cf)
             # cf = edict(cf)
             with open(self.args.config_file, 'r') as f:
-                cf = yaml.load(f)
+                cf = yaml.load(f, Loader=yaml.Loader)
                 # print(cf.crop_train)
                 # print(type(cf.crop_train))
                 # print(len(cf.crop_train))
@@ -55,7 +55,7 @@ class Configuration():
             cf.predict_path_output = os.path.join(cf.exp_folder,'predictions/')
             if not os.path.exists(cf.predict_path_output):
                 os.makedirs(cf.predict_path_output)
-        cf.original_size = cf.size_image_test
+        # cf.original_size = cf.size_image_test
         if cf.input_model_path is None:
             cf.input_model_path = os.path.join(cf.exp_folder, cf.model_name + '.pth')
         if cf.output_model_path is None:

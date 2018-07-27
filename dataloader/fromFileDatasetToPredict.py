@@ -26,7 +26,7 @@ class fromFileDatasetToPredict(Data_loader):
         img_path = self.image_names[self.indexes[idx]]
         img_path_comp = img_path.split("/")
         img_name = img_path_comp[-1]
-        img = self.load_img(img_path, self.resize, self.cf.grayscale, order=1)
+        img, shape = self.load_img(img_path, self.resize, self.cf.grayscale, order=1)
         if self.preprocess is not None:
             img = self.preprocess(img)
-        return img, img_name
+        return img, img_name, shape

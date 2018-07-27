@@ -4,7 +4,7 @@ import json
 class Logger(object):
     def __init__(self, log_file):
         self.file = log_file
-        log = open(log_file, 'w')
+        log = open(log_file, 'a')
         log.close()
 
     def write(self, message):

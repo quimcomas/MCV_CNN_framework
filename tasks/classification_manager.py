@@ -152,6 +152,6 @@ class Classification_Manager(SimpleTrainer):
             self.filename = os.path.join(self.cf.predict_path_output, 'predictions.txt')
             self.f = open(self.filename,'w')
 
-        def write_results(self,predictions, img_name):
-                msg = img_name[0] + ' ' + str(predictions[0]) + '\n'
-                self.f.writelines(msg)
+        def write_results(self, predictions, img_name, img_shape):
+            msg = img_name[0] + ' ' + str(predictions[0]) + '\n'
+            self.f.writelines(msg)
