@@ -204,6 +204,9 @@ class Configuration():
                             help="True: If dataset is in grayscale")
 
         # Dataset properties
+        parser.add_argument("--dataset",
+                            type=str,
+                            help="Dataset name to read bounding boxes (only for detection)")
         parser.add_argument("--train_images_txt",
                             type=str,
                             help="File that contains the train images")
@@ -395,6 +398,8 @@ class Configuration():
         if self.args.grayscale is not None:
             cf.grayscale = self.args.grayscale
             # Dataset properties
+        if self.args.dataset is not None:
+            cf.dataset = self.args.dataset
         if self.args.train_images_txt is not None:
             cf.train_images_txt = self.args.train_images_txt
         if self.args.train_gt_txt is not None:

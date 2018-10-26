@@ -39,7 +39,7 @@ class Data_loader(Dataset):
         return file_paths, file_names
 
     # Load image using PIL
-    def Load_image(self, image_path, resize, grayscale, order = 1):
+    def Load_image(self, image_path, resize=None, grayscale=False):
         img = Image.open(image_path)
         # Resize
         if resize is not None:
@@ -52,7 +52,7 @@ class Data_loader(Dataset):
         return img
 
     # Load image using Skimage
-    def load_img_cv(self, path, resize=None, grayscale=False, order=1):
+    def load_img_cv(self, path, resize=None, grayscale=False):
         # Load image
         img = cv.imread(path)[...,::-1]
         if resize is not None:

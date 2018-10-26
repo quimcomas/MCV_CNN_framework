@@ -2,10 +2,10 @@ import math
 import sys
 import time
 import numpy as np
-from torch.autograd import Variable
 import torch
 import operator
 import os
+from torch.autograd import Variable
 
 sys.path.append('../')
 from utils.tools import AverageMeter, Early_Stopping
@@ -13,7 +13,7 @@ from utils.ProgressBar import ProgressBar
 from utils.logger import Logger
 from utils.statistics import Statistics
 from utils.messages import Messages
-from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm,compute_mIoU
+from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm, compute_mIoU
 from tensorboardX import SummaryWriter
 
 class SimpleTrainer(object):
@@ -47,8 +47,8 @@ class SimpleTrainer(object):
 
         def start(self, train_loader, train_set, valid_set=None,
                   valid_loader=None):
-            train_num_batches = math.ceil(train_set.num_images / float(self.cf.train_batch_size))
-            val_num_batches = 0 if valid_set is None else math.ceil(valid_set.num_images / \
+            self.train_num_batches = math.ceil(train_set.num_images / float(self.cf.train_batch_size))
+            self.val_num_batches = 0 if valid_set is None else math.ceil(valid_set.num_images / \
                                                                     float(self.cf.valid_batch_size))
             # Define early stopping control
             if self.cf.early_stopping:
@@ -57,8 +57,8 @@ class SimpleTrainer(object):
                 early_Stopping = None
 
             prev_msg = '\nTotal estimated training time...\n'
-            global_bar = ProgressBar((self.cf.epochs+1-self.curr_epoch)*(train_num_batches+val_num_batches), lenBar=20)
-            global_bar.set_prev_msg(prev_msg)
+            self.global_bar = ProgressBar((self.cf.epochs+1-self.curr_epoch)*(self.train_num_batches+self.val_num_batches), lenBar=20)
+            self.global_bar.set_prev_msg(prev_msg)
 
 
             # Train process
@@ -73,59 +73,26 @@ class SimpleTrainer(object):
                 # Initialize epoch progress bar
                 self.msg.accum_str = '\n\nEpoch %d/%d estimated time...\n' % \
                                      (epoch, self.cf.epochs)
-                epoch_bar = ProgressBar(train_num_batches, lenBar=20)
+                epoch_bar = ProgressBar(self.train_num_batches, lenBar=20)
                 epoch_bar.update(show=False)
 
                 # Initialize stats
                 self.stats.epoch = epoch
-                train_loss = AverageMeter()
-                confm_list = np.zeros((self.cf.num_classes, self.cf.num_classes))
+                self.train_loss = AverageMeter()
+                self.confm_list = np.zeros((self.cf.num_classes, self.cf.num_classes))
 
                 # Train epoch
-                for i, data in enumerate(train_loader):
-                    # Read Data
-                    inputs, labels = data
-
-                    N,w,h,c = inputs.size()
-                    inputs = Variable(inputs).cuda()
-                    self.inputs = inputs
-                    self.labels = Variable(labels).cuda()
-
-                    # Predict model
-                    self.model.optimizer.zero_grad()
-                    self.outputs = self.model.net(inputs)
-                    predictions = self.outputs.data.max(1)[1].cpu().numpy()
-
-                    # Compute gradients
-                    self.compute_gradients()
-
-                    # Compute batch stats
-                    train_loss.update(float(self.loss.cpu().data[0]), N)
-                    confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
-                                                     self.cf.void_class)
-                    confm_list = map(operator.add, confm_list, confm)
-
-                    if self.cf.normalize_loss:
-                        self.stats.train.loss = train_loss.avg
-                    else:
-                        self.stats.train.loss = train_loss.avg
-
-                    if not self.cf.debug:
-                        # Save stats
-                        self.save_stats_batch((epoch - 1) * train_num_batches + i)
-
-                        # Update epoch messages
-                        self.update_epoch_messages(epoch_bar, global_bar, train_num_batches, epoch, i)
+                self.training_loop(epoch, train_loader, epoch_bar)
 
                 # Save stats
-                self.stats.train.conf_m = confm_list
-                self.compute_stats(np.asarray(confm_list),train_loss)
+                self.stats.train.conf_m = self.confm_list
+                self.compute_stats(np.asarray(self.confm_list), self.train_loss)
                 self.save_stats_epoch(epoch)
                 self.logger_stats.write_stat(self.stats.train, epoch, os.path.join(self.cf.train_json_path,
                                                                                 'train_epoch_' + str(epoch) + '.json'))
 
                 # Validate epoch
-                self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, global_bar)
+                self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, self.global_bar)
 
                 # Update scheduler
                 if self.model.scheduler is not None:
@@ -145,6 +112,43 @@ class SimpleTrainer(object):
             # Save model without training
             if self.cf.epochs == 0:
                 self.model.save_model()
+
+        def training_loop(self, epoch, train_loader, epoch_bar):
+            # Train epoch
+            for i, data in enumerate(train_loader):
+                # Read Data
+                inputs, labels = data
+
+                N, w, h, c = inputs.size()
+                inputs = Variable(inputs).cuda()
+                self.inputs = inputs
+                self.labels = Variable(labels).cuda()
+
+                # Predict model
+                self.model.optimizer.zero_grad()
+                self.outputs = self.model.net(inputs)
+                predictions = self.outputs.data.max(1)[1].cpu().numpy()
+
+                # Compute gradients
+                self.compute_gradients()
+
+                # Compute batch stats
+                self.train_loss.update(float(self.loss.cpu().data[0]), N)
+                confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
+                                                 self.cf.void_class)
+                self.confm_list = map(operator.add, self.confm_list, confm)
+
+                if self.cf.normalize_loss:
+                    self.stats.train.loss = self.train_loss.avg
+                else:
+                    self.stats.train.loss = self.train_loss.avg
+
+                if not self.cf.debug:
+                    # Save stats
+                    self.save_stats_batch((epoch - 1) * self.train_num_batches + i)
+
+                    # Update epoch messages
+                    self.update_epoch_messages(epoch_bar, self.global_bar, self.train_num_batches, epoch, i)
 
         def save_stats_epoch(self, epoch):
             # Save logger
@@ -234,7 +238,7 @@ class SimpleTrainer(object):
         def start(self, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None):
             confm_list = np.zeros((self.cf.num_classes,self.cf.num_classes))
 
-            val_loss = AverageMeter()
+            self.val_loss = AverageMeter()
 
             # Initialize epoch progress bar
             val_num_batches = math.ceil(valid_set.num_images / float(self.cf.valid_batch_size))
@@ -244,42 +248,10 @@ class SimpleTrainer(object):
             bar.update(show=False)
 
             # Validate model
-            for vi, data in enumerate(valid_loader):
-                # Read data
-                inputs, gts = data
-                n_images,w,h,c = inputs.size()
-                inputs = Variable(inputs).cuda()
-                gts = Variable(gts).cuda()
-
-                # Predict model
-                with torch.no_grad():
-                    outputs = self.model.net(inputs)
-                    predictions = outputs.data.max(1)[1].cpu().numpy()
-
-                    # Compute batch stats
-                    val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
-                    confm = compute_confusion_matrix(predictions,gts.cpu().data.numpy(),self.cf.num_classes,
-                                                     self.cf.void_class)
-                    confm_list = map(operator.add, confm_list, confm)
-
-                # Save epoch stats
-                self.stats.val.conf_m = confm_list
-                if not self.cf.normalize_loss:
-                    self.stats.val.loss = val_loss.avg
-                else:
-                    self.stats.val.loss = val_loss.avg
-
-                # Save predictions and generate overlaping
-                self.update_tensorboard(inputs.cpu(),gts.cpu(),
-                                        predictions,epoch,range(vi*self.cf.valid_batch_size,
-                                                                vi*self.cf.valid_batch_size+np.shape(predictions)[0]),
-                                                                valid_set.num_images)
-
-                # Update messages
-                self.update_msg(bar, global_bar)
+            self.validation_loop(epoch, valid_loader, valid_set, bar, global_bar, confm_list)
 
             # Compute stats
-            self.compute_stats(np.asarray(self.stats.val.conf_m), val_loss)
+            self.compute_stats(np.asarray(self.stats.val.conf_m), self.val_loss)
 
             # Save stats
             self.save_stats(epoch)
@@ -290,6 +262,42 @@ class SimpleTrainer(object):
                 self.logger_stats.write_stat(self.stats.val, epoch, self.cf.val_json_file)
             elif mode == 'Test':
                 self.logger_stats.write_stat(self.stats.test, epoch, self.cf.test_json_file)
+
+        def validation_loop(self, epoch, valid_loader, valid_set, bar, global_bar, confm_list):
+            for vi, data in enumerate(valid_loader):
+                # Read data
+                inputs, gts = data
+                n_images, w, h, c = inputs.size()
+                inputs = Variable(inputs).cuda()
+                gts = Variable(gts).cuda()
+
+                # Predict model
+                with torch.no_grad():
+                    outputs = self.model.net(inputs)
+                    predictions = outputs.data.max(1)[1].cpu().numpy()
+
+                    # Compute batch stats
+                    self.val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
+                    confm = compute_confusion_matrix(predictions, gts.cpu().data.numpy(), self.cf.num_classes,
+                                                     self.cf.void_class)
+                    confm_list = map(operator.add, confm_list, confm)
+
+                # Save epoch stats
+                self.stats.val.conf_m = confm_list
+                if not self.cf.normalize_loss:
+                    self.stats.val.loss = self.val_loss.avg
+                else:
+                    self.stats.val.loss = self.val_loss.avg
+
+                # Save predictions and generate overlaping
+                self.update_tensorboard(inputs.cpu(), gts.cpu(),
+                                        predictions, epoch, range(vi * self.cf.valid_batch_size,
+                                                                  vi * self.cf.valid_batch_size +
+                                                                  np.shape(predictions)[0]),
+                                        valid_set.num_images)
+
+                # Update messages
+                self.update_msg(bar, global_bar)
 
         def update_tensorboard(self,inputs,gts,predictions,epoch,indexes,val_len):
             pass

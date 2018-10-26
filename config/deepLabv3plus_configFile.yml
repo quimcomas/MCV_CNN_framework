@@ -3,7 +3,7 @@ problem_type                : 'segmentation'
 # Option: ['segmentation','classification']
 
 # Model
-model_type                  : 'fcn8atonce'
+model_type                  : 'deeplabv3xception'
 # Options: ['DenseNetFCN', 'FCN8']
 ### DenseNetFCN options ####
 model_blocks                : 5
@@ -21,7 +21,7 @@ model_compression           : 0.0
 
 ### load/store options
 resume_experiment           : False
-pretrained_model            : 'basic'
+pretrained_model            : 'None'
 # 'None': from scratch, 'basic': pretraned from imagenet, 'custom': personal model
 input_model_path            : null
 # Path and pretrained file to load [None uses experiment path and model name by default]
@@ -31,7 +31,7 @@ load_weight_only            : True
 ### Save options
 save_weight_only            : True
 # Recomended true, stores only weights and parameters
-model_name                  : 'fcn8atonce'
+model_name                  : 'deeplabv3plus'
 # Name of the model to store
 output_model_path           : null
 # Path to store the model using model_name [None uses the default experiment path]
@@ -51,7 +51,7 @@ valid_samples               : -1
 #-1 uses all the data available inside the dataset files
 test_samples                : -1
 #-1 uses all the data available inside the dataset files
-train_batch_size            : 1
+train_batch_size            : 3
 valid_batch_size            : 1
 test_batch_size             : 1
 train                       : True
@@ -65,10 +65,10 @@ predict_path_output:
 
 # Image properties
 size_image_test             : null
-resize_image_train          : null #!!python/tuple [512, 1024]
-resize_image_valid          : null #!!python/tuple [512, 1024]
+resize_image_train          : !!python/tuple [512, 1024]
+resize_image_valid          : !!python/tuple [512, 1024]
 resize_image_test           : null #!!python/tuple [512, 1024]
-crop_train                  : null #!!python/tuple [720,720] #!!python/tuple [320, 320]
+crop_train                  : null #!!python/tuple [512,1024] #!!python/tuple [320, 320]
 grayscale                   : False
 #Use this option to convert to rgb a grascale dataset
 
@@ -100,14 +100,14 @@ valid_samples_epoch: -1
 # Number of validation images used to validate an epoch
 is_training                 : True
 ### Optimizer ###
-optimizer                   : 'SGD'
+optimizer                   : 'sgd'
 momentum1: 0.9
 momentum2: 0.99
 learning_rate               : 1.0e-3
 learning_rate_bias: 1.0e-3
-weight_decay: 5.0e-5
+weight_decay: 5.0e-4
 ### Scheduler
-scheduler : null
+scheduler : 'MultiStep'
 #['ReduceLROnPlateau','Step','MultiStep','Exponential', None]
 decay : 0.1
 #Learnng rate decay to apply (lr*decay)
@@ -115,16 +115,16 @@ sched_patience: 5
 # ReduceLROnPlateau option: epoch patience without loss change until a lr decrement
 step_size: 20
 #Step option: epoch counter to decrease lr
-milestone: [10]
+milestone: [20 40 60]
 #MultiStep option: define different milestones (epochs) to decrease lr
 ### Save criteria
 save_condition: 'valid_mIoU'
 # ['always','(x)_loss','(x)_mAcc','(x)_mIoU'] x : valid or train_loss
 ### Early Stopping
-early_stopping : False
+early_stopping : True
 stop_condition: 'valid_mIoU'
 # [(x)_loss','(x)_mAcc','(x)_mIoU'] x : valid or train_loss
-patience: 5
+patience: 10
 
 # Image preprocess
 rescale                     : 1. #0.003921569

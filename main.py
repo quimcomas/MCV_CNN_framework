@@ -1,6 +1,7 @@
 import time
 from tasks.semanticSegmentator_manager import SemanticSegmentation_Manager
 from tasks.classification_manager import Classification_Manager
+from tasks.detection_manager import Detection_Manager
 from config.configuration import Configuration
 from models.model_builder import Model_builder
 from utils.logger import Logger
@@ -26,11 +27,13 @@ def main():
         problem_manager = SemanticSegmentation_Manager(cf, model)
     elif cf.problem_type == 'classification':
         problem_manager = Classification_Manager(cf, model)
+    elif cf.problem_type == 'detection':
+        problem_manager = Detection_Manager(cf, model)
     else:
         raise ValueError('Unknown problem type')
 
     # Create dataloader builder
-    dataloader = Dataloader_Builder(cf)
+    dataloader = Dataloader_Builder(cf, model)
 
     if cf.train:
         model.net.train()  # enable dropout modules and others

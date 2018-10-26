@@ -8,12 +8,18 @@ sys.path.append('../')
 from models.networks.segmentation.FCN8 import FCN8
 from models.networks.segmentation.FCN8AtOnce import FCN8AtOnce
 from models.networks.segmentation.FCdenseNetTorch import FCDenseNet
+from models.networks.segmentation.DeepLabv3plus import DeepLabv3_plus
+from models.networks.segmentation.deeplabv3plus_xception import DeepLabv3_xception
+from models.networks.segmentation.deeplabv2_resnet import MS_Deeplab
+from models.networks.detection.ssd import SSD300
+from models.networks.detection.ssd import SSD512
 from models.networks.classification.VGG16 import VGG16
 # from models.networks.detection.rpn import RPN
 from models.loss.loss_builder import Loss_Builder
 from models.optimizer.optimizer_builder import Optimizer_builder
 from models.scheduler.scheduler_builder import scheduler_builder
 from utils.statistics import Statistics
+from utils.ssd_box_coder import SSDBoxCoder
 
 class Model_builder():
     def __init__(self, cf):
@@ -25,10 +31,11 @@ class Model_builder():
         self.best_stats = Statistics()
         
     def build(self):
+        # custom model
         if self.cf.pretrained_model.lower() == 'custom' and not self.cf.load_weight_only:
             self.net = self.restore_model()
             return self.net
-
+        # segmentation networks
         if self.cf.model_type.lower() == 'densenetfcn':
             self.net = FCDenseNet(self.cf, nb_layers_per_block=self.cf.model_layers,
                                 growth_rate=self.cf.model_growth,
@@ -40,8 +47,22 @@ class Model_builder():
             self.net = FCN8(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         elif self.cf.model_type.lower() == 'fcn8atonce':
             self.net = FCN8AtOnce(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'deeplabv3plus':
+            self.net = DeepLabv3_plus(self.cf, n_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'deeplabv3xception':
+            self.net = DeepLabv3_xception(self.cf, n_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'deeplabv2':
+            self.net = MS_Deeplab(self.cf, n_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        # object detection networks
         # elif self.cf.model_type.lower() == 'rpn':
         #     self.net = RPN(self.cf, 512)
+        elif self.cf.model_type.lower() == 'ssd320':
+            self.net = SSD300(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+            self.box_coder = SSDBoxCoder(self.net)
+        elif self.cf.model_type.lower() == 'ssd512':
+            self.net = SSD512(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+            self.box_coder = SSDBoxCoder(self.net)
+        # classification networks
         elif self.cf.model_type.lower() == 'vgg16':
             self.net = VGG16(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         else:
