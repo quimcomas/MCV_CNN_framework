@@ -235,7 +235,7 @@ class SimpleTrainer(object):
             self.msg = msg
             self.writer = SummaryWriter(os.path.join(cf.tensorboard_path, 'validation'))
 
-        def start(self, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None):
+        def start(self, valid_set, valid_loader, mode='Validation', epoch=None, global_bar=None, save_folder=None):
             confm_list = np.zeros((self.cf.num_classes,self.cf.num_classes))
 
             self.val_loss = AverageMeter()
@@ -248,7 +248,10 @@ class SimpleTrainer(object):
             bar.update(show=False)
 
             # Validate model
-            self.validation_loop(epoch, valid_loader, valid_set, bar, global_bar, confm_list)
+            if self.cf.problem_type == 'detection':
+                self.validation_loop(epoch, valid_loader, valid_set, bar, global_bar, save_folder)
+            else:
+                self.validation_loop(epoch, valid_loader, valid_set, bar, global_bar, confm_list)
 
             # Compute stats
             self.compute_stats(np.asarray(self.stats.val.conf_m), self.val_loss)

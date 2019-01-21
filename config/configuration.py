@@ -48,6 +48,7 @@ class Configuration():
         cf.val_json_file = os.path.join(cf.exp_folder, "json_stats/val_stats.json")
         cf.test_json_file = os.path.join(cf.exp_folder, "json_stats/test_stats.json")
         cf.best_json_file = os.path.join(cf.exp_folder, "json_stats/best_model_stats.json")
+        cf.temp_folder = os.path.join(cf.exp_folder, "temp")
         # Copy config file TODO: create a file saver for parse config
         # shutil.copyfile(cf.config_file, os.path.join(cf.exp_folder, "config.py"))
 

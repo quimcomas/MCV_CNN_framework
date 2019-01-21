@@ -18,6 +18,7 @@ class fromFileDatasetDetection(Data_loader):
         self.boxes = []
         self.labels = []
         self.fnames = []
+        self.valid = valid
         print ("\t Images from: " + image_txt)
         with open(image_txt) as f:
             image_names = f.readlines()
@@ -36,16 +37,17 @@ class fromFileDatasetDetection(Data_loader):
         if len(self.gt_names) != len(self.image_names):
             raise ValueError('number of images != number GT images')
         print ("\t Images found: " + str(len(self.image_names)))
-        if len(self.image_names) < self.num_images or self.num_images == -1:
-            self.num_images = len(self.image_names)
+        if len(self.fnames) < self.num_images or self.num_images == -1:
+            self.num_images = len(self.fnames)
         self.img_indexes = np.arange(len(self.image_names))
-        self.update_indexes(valid=valid)
+        self.update_indexes(valid=self.valid)
 
     def __len__(self):
         return self.num_images
 
     def __getitem__(self, idx):
         img_path = self.image_names[self.indexes[idx]]
+        gt_path = self.gt_names[self.indexes[idx]]
         img = self.Load_image(img_path, resize=None, grayscale=self.cf.grayscale)
         boxes = self.boxes[idx].clone()  # used clone to avoid any potential change.
         labels = self.labels[idx].clone()
@@ -55,6 +57,8 @@ class fromFileDatasetDetection(Data_loader):
             img = self.preprocess(img)
         if self.box_coder is not None:
             boxes, labels = self.box_coder.encode(boxes, labels)
+        if self.valid:
+            return img, boxes, labels, gt_path
         return img, boxes, labels
 
     def update_indexes(self, num_images=None, valid=False):

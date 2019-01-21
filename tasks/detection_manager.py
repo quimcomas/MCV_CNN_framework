@@ -1,4 +1,5 @@
 import sys
+import subprocess
 import time
 import numpy as np
 import os
@@ -12,6 +13,8 @@ import torch.nn.functional as F
 sys.path.append('../')
 from simple_trainer_manager import SimpleTrainer
 from metrics.metrics import compute_accuracy, compute_confusion_matrix, extract_stats_from_confm, compute_mIoU
+from utils.plot import Compute_plot
+from metrics.object_detection import Compute_kitti_AP
 
 class Detection_Manager(SimpleTrainer):
     def __init__(self, cf, model):
@@ -68,7 +71,8 @@ class Detection_Manager(SimpleTrainer):
                 # Set model in validation mode
                 self.model.net.eval()
                 self.model.net.training = False
-                self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
+                self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch,
+                                     global_bar=global_bar, save_folder=self.cf.temp_folder)
 
                 # Early stopping checking
                 if self.cf.early_stopping:
@@ -92,15 +96,18 @@ class Detection_Manager(SimpleTrainer):
             self.logger_stats.write('\t Epoch step finished: %ds \n' % (epoch_time))
 
             # Compute best stats
-            self.msg.msg_stats_last = '\nLast epoch: mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
-            100 * self.stats.val.mIoU, 100 * self.stats.val.acc, self.stats.val.loss)
+            self.msg.msg_stats_last = '\nLast epoch: loss = %.5f' % (self.stats.val.loss)
+            for label in range(len(self.cf.labels)):
+                self.msg.msg_stats_last += ', AP_%s %.2f' % (self.cf.labels[label], self.stats.val.AP_perclass[label])
             if new_best:
-                self.msg.msg_stats_best = 'Best case [%s]: epoch = %d, mIoU = %.2f, acc= %.2f, loss = %.5f\n' % (
-                                          self.cf.save_condition,epoch, 100 * self.stats.val.mIoU,
-                                          100 * self.stats.val.acc, self.stats.val.loss)
-                msg_confm = self.stats.val.get_confm_str()
-                self.logger_stats.write(msg_confm)
-                self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
+                self.msg.msg_stats_best = '\n Best case [%s]: epoch = %d, loss = %.5f' % (
+                                          self.cf.save_condition,epoch, self.stats.val.loss)
+                for label in range(len(self.cf.labels)):
+                    self.msg.msg_stats_last += ', AP_%s %.2f' % (
+                    self.cf.labels[label], self.stats.val.AP_perclass[label])
+                # msg_confm = self.stats.val.get_confm_str()
+                # self.logger_stats.write(msg_confm)
+                # self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
 
         def compute_stats(self, confm_list, train_loss):
             # TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
@@ -126,19 +133,31 @@ class Detection_Manager(SimpleTrainer):
         def __init__(self, logger_stats, model, cf, stats, msg):
             super(Detection_Manager.validation, self).__init__(logger_stats, model, cf, stats, msg)
 
-        def validation_loop(self, epoch, valid_loader, valid_set, bar, global_bar):
+        def validation_loop(self, epoch, valid_loader, valid_set, bar, global_bar, save_folder=None):
+            if epoch is None:
+                if not os.path.exists(os.path.join(self.cf.predict_path_output,'data')):
+                    os.makedirs(os.path.join(self.cf.predict_path_output,'data'))
+            else:
+                if not os.path.exists(os.path.join(save_folder,'data')):
+                    os.makedirs(os.path.join(save_folder,'data'))
+                val_epoch_images = open(os.path.join(save_folder, "val_epoch_images.txt"), 'w')
             for vi, data in enumerate(valid_loader):
                 # Read data
-                inputs, loc_targets, cls_targets = data
-                n_images, w, h, c = inputs.size()
+                inputs, loc_targets, cls_targets, gt_path = data
+                n_images, _, _, _ = inputs.size()
+                img_name = gt_path[0].split('/')[-1].split('.')[0]
                 inputs = Variable(inputs).cuda()
-                print(inputs.size())
+                loc_targets = Variable(loc_targets).cuda()
+                cls_targets = Variable(cls_targets).cuda()
+                if epoch is None:
+                    f = open(os.path.join(self.cf.predict_path_output, 'data', img_name + ".txt"), 'w')
+                else:
+                    f = open(os.path.join(save_folder , 'data', img_name + ".txt"), 'w')
                 # Predict model
                 with torch.no_grad():
                     loc_preds, cls_preds = self.model.net(inputs)
-                    print(loc_preds.size())
-                    print(cls_preds.size())
-                    # predictions = outputs.data.max(1)[1].cpu().numpy()
+                    # self.val_loss.update(float(self.model.loss(loc_preds, loc_targets, cls_preds,
+                    #                                            cls_targets).cpu().data[0] / n_images), n_images)
                     box_preds, label_preds, score_preds = self.model.box_coder.decode(
                         loc_preds.cpu().data.squeeze(),
                         F.softmax(cls_preds.squeeze(), dim=1).cpu().data,
@@ -147,40 +166,57 @@ class Detection_Manager(SimpleTrainer):
                         box_preds = box_preds.cpu().numpy()
                         label_preds = label_preds.cpu().numpy()
                         score_preds = score_preds.cpu().numpy()
-                        print(box_preds.size)
-                        print(label_preds.size)
-                        print(score_preds.size)
-                    exit(-1)
+                        # print(len(box_preds))
+                        # print(label_preds.size)
+                        # print(score_preds.size)
+                        for det in range(len(box_preds)):
+                            f.write(self.cf.labels[label_preds[det]] + ' ' + str(0) + ' ' + str(0) + ' ' + '-10' + ' ' \
+                                    + str(box_preds[det][0]) + ' ' + str(box_preds[det][1]) + ' ' \
+                                    + str(box_preds[det][2]) + ' ' + str(box_preds[det][3]) + ' ' \
+                                    + '-1 -1 -1 -1000 -1000 -1000 ' \
+                                    + '-1000 ' \
+                                    + str(score_preds[det]) + '\n'
+                                    )
+                    f.close()
+                    if epoch is not None:
+                        val_epoch_images.write(gt_path[0] + '\n')
                     # Compute batch stats
-                    self.val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
-                    confm = compute_confusion_matrix(predictions, gts.cpu().data.numpy(), self.cf.num_classes,
-                                                     self.cf.void_class)
-                    confm_list = map(operator.add, confm_list, confm)
-
+                    # self.val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
+                    # confm = compute_confusion_matrix(predictions, gts.cpu().data.numpy(), self.cf.num_classes,
+                    #                                  self.cf.void_class)
+                    # confm_list = map(operator.add, confm_list, confm)
+		
                 # Save epoch stats
-                self.stats.val.conf_m = confm_list
+                # self.stats.val.conf_m = confm_list
                 if not self.cf.normalize_loss:
                     self.stats.val.loss = self.val_loss.avg
                 else:
                     self.stats.val.loss = self.val_loss.avg
 
                 # Save predictions and generate overlaping
-                self.update_tensorboard(inputs.cpu(), gts.cpu(),
-                                        predictions, epoch, range(vi * self.cf.valid_batch_size,
-                                                                  vi * self.cf.valid_batch_size +
-                                                                  np.shape(predictions)[0]),
-                                        valid_set.num_images)
+                # self.update_tensorboard(inputs.cpu(), gts.cpu(),
+                #                         predictions, epoch, range(vi * self.cf.valid_batch_size,
+                #                                                   vi * self.cf.valid_batch_size +
+                #                                                   np.shape(predictions)[0]),
+                #                         valid_set.num_images)
 
                 # Update messages
                 self.update_msg(bar, global_bar)
 
+            val_epoch_images.close()
+            # Calculate stats for detection
+            # extern kitti evaluation call
+            evaluation_bash_comand = "./devkit_kitti_txt/cpp/evaluate_object_txt %s %s %s" % (
+                self.cf.temp_folder, os.path.join(self.cf.temp_folder,"val_epoch_images.txt"), self.cf.temp_folder)
+            process = subprocess.Popen(evaluation_bash_comand, shell=True)
+            process.communicate()
+
+
         def compute_stats(self, confm_list, val_loss):
-            TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
-            mean_IoU = compute_mIoU(TP_list, FP_list, FN_list)
-            mean_accuracy = compute_accuracy_segmentation(TP_list, FN_list)
-            self.stats.val.acc = np.nanmean(mean_accuracy)
-            self.stats.val.mIoU_perclass = mean_IoU
-            self.stats.val.mIoU = np.nanmean(mean_IoU)
+            for label in self.cf.labels:
+                scores = Compute_kitti_AP(os.path.join(self.cf.temp_folder,"stats_%s_detection.txt" %(label.lower())))
+                # print scores
+                self.stats.val.AP_perclass.append(scores[1])
             if val_loss is not None:
                 self.stats.val.loss = val_loss.avg
 
@@ -189,26 +225,29 @@ class Detection_Manager(SimpleTrainer):
             if epoch is not None:
                 # add log
                 self.logger_stats.write('----------------- Epoch scores summary ------------------------- \n')
-                self.logger_stats.write('[epoch %d], [val loss %.5f], [acc %.2f], [mean_IoU %.2f] \n' % (
-                    epoch, self.stats.val.loss, 100*self.stats.val.acc, 100*self.stats.val.mIoU))
-                self.logger_stats.write('---------------------------------------------------------------- \n')
-
+                self.logger_stats.write('[epoch %d], [val loss %.5f]' % (
+                    epoch, self.stats.val.loss))
+                for label in range(len(self.cf.labels)):
+                    self.logger_stats.write(', [AP_%s %.2f]' % (self.cf.labels[label], self.stats.val.AP_perclass[label]))
+                    # add scores to tensorboard
+                    self.writer.add_scalar('metrics/AP_%s'%(self.cf.labels[label]),
+                                           100.*self.stats.val.AP_perclass[label], epoch)
+                self.logger_stats.write('\n---------------------------------------------------------------- \n')
                 # add scores to tensorboard
                 self.writer.add_scalar('losses/epoch',  self.stats.val.loss, epoch)
-                self.writer.add_scalar('metrics/accuracy', 100.*self.stats.val.acc, epoch)
-                self.writer.add_scalar('metrics/mIoU', 100.*self.stats.val.mIoU, epoch)
-                conf_mat_img = confm_metrics2image(self.stats.val.get_confm_norm(), self.cf.labels)
-                self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
+
             else:
                 self.logger_stats.write('----------------- Scores summary -------------------- \n')
-                self.logger_stats.write('[val loss %.5f], [acc %.2f], [mean_IoU %.2f]\n' % (
-                    self.stats.val.loss, 100 * self.stats.val.acc, 100 * self.stats.val.mIoU))
-                self.logger_stats.write('---------------------------------------------------------------- \n')
+                self.logger_stats.write('[val loss %.5f]' % (
+                    self.stats.val.loss))
+                for label in range(len(self.cf.labels)):
+                    self.logger_stats.write(', [AP_%s %.2f]' % (self.cf.labels[label], self.stats.val.AP_perclass[label]))
+                self.logger_stats.write('\n---------------------------------------------------------------- \n')
 
         def update_msg(self, bar, global_bar):
 
-            self.compute_stats(np.asarray(self.stats.val.conf_m), None)
-            bar.set_msg(', mIoU: %.02f' % (100.*np.nanmean(self.stats.val.mIoU)))
+            # self.compute_stats(np.asarray(self.stats.val.conf_m), None)
+            # bar.set_msg(', mIoU: %.02f' % (100.*np.nanmean(self.stats.val.mIoU)))
 
             if global_bar==None:
                 # Update progress bar

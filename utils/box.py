@@ -110,6 +110,7 @@ def box_nms(bboxes, scores, threshold=0.5):
     keep = []
     while order.numel() > 0:
         i = order[0]
+        # i = order.item()
         keep.append(i)
 
         if order.numel() == 1:

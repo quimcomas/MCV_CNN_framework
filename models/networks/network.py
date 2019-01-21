@@ -57,8 +57,8 @@ class Net(nn.Module):
 
     def download_if_not_exist(self, filename):
         # Download the file if it does not exist
-        print(self.url)
-        print(not os.path.isfile(filename))
+        # print(self.url)
+        # print(not os.path.isfile(filename))
         if not os.path.isfile(filename) and self.url is not None:
             print("downloading file")
             wget.download(self.url, filename)
@@ -67,9 +67,12 @@ class Net(nn.Module):
 
     def restore_weights(self, filename):
         print('\t Restoring weight from ' + filename)
-        self.load_state_dict(torch.load(os.path.join(filename)))
+        if self.cf.model_type.lower() == 'ssd512':
+            self.load_state_dict(torch.load(filename), strict=False)
+        else:
+            self.load_state_dict2(torch.load(filename))
 
-    def load_state_dict(self, pretrained_dict):
+    def load_state_dict2(self, pretrained_dict):
         model_dict = self.state_dict()
 
         for k, v in pretrained_dict.items():
@@ -79,8 +82,8 @@ class Net(nn.Module):
             else:
                 model_dict[k] = v
 
-        super(Net, self).load_state_dict(model_dict)
+        super(Net, self).load_state_dict2(model_dict)
 
     def restore_weights2(self, filename):
         print('\t Restoring weight from ' + filename)
-        self.load_state_dict(torch.load(os.path.join(filename))['model_state_dict'])
+        self.load_state_dict2(torch.load(os.path.join(filename))['model_state_dict'])
