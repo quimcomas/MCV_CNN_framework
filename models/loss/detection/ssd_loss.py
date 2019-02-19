@@ -64,4 +64,4 @@ class SSDLoss(nn.Module):
 
         # print('loc_loss: %.3f | cls_loss: %.3f' % (loc_loss.item()/(num_pos+0.000001), cls_loss.item()/(num_pos+0.000001)), end=' | ')
         loss = (loc_loss+cls_loss)/(num_pos+0.000001)
-        return loss
+        return loss, loc_loss.item()/(num_pos+0.000001), cls_loss.item()/(num_pos+0.000001)

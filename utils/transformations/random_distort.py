@@ -2,6 +2,9 @@ import random
 import torchvision.transforms as transforms
 
 class Random_distort(object):
+    def __init__(self, cf):
+        self.cf = cf
+
     def __call__(self, img, brightness_delta=32/255., contrast_delta=0.5, saturation_delta=0.5, hue_delta=0.1):
         '''A color related data augmentation used in SSD.
 
@@ -35,13 +38,14 @@ class Random_distort(object):
                 img = transforms.ColorJitter(hue=delta)(img)
             return img
 
-        img = brightness(img, brightness_delta)
-        if random.random() < 0.5:
-            img = contrast(img, contrast_delta)
-            img = saturation(img, saturation_delta)
-            img = hue(img, hue_delta)
-        else:
-            img = saturation(img, saturation_delta)
-            img = hue(img, hue_delta)
-            img = contrast(img, contrast_delta)
+        if self.cf.random_dist:
+            img = brightness(img, brightness_delta)
+            if random.random() < 0.5:
+                img = contrast(img, contrast_delta)
+                img = saturation(img, saturation_delta)
+                img = hue(img, hue_delta)
+            else:
+                img = saturation(img, saturation_delta)
+                img = hue(img, hue_delta)
+                img = contrast(img, contrast_delta)
         return img

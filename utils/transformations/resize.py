@@ -6,7 +6,7 @@ class Resize(object):
     def __init__(self, cf):
         self.cf = cf
 
-    def __call__(self, img, boxes, labels, max_size=1000, random_interpolation=False):
+    def __call__(self, img, boxes, max_size=1000, random_interpolation=False):
         '''Resize the input PIL image to given size.
 
         If boxes is not None, resize boxes accordingly.
@@ -55,4 +55,4 @@ class Resize(object):
             img = img.resize((ow,oh), method)
             # img = cv.resize(img, (ow,oh))
             boxes = boxes * torch.tensor([sw,sh,sw,sh])
-        return img, boxes, labels
+        return img, boxes, (sw,sh)

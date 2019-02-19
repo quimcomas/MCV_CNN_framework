@@ -7,13 +7,14 @@ from dataloader import Data_loader
 class fromFileDatasetDetection(Data_loader):
 
     def __init__(self, cf, image_txt, gt_txt, num_images, resize=None,
-                        preprocess=None, transform=None, valid=False, box_coder=None):
+                        preprocess=None, transform=None, valid=False, box_coder=None, resize_process=None):
         super(fromFileDatasetDetection, self).__init__()
         self.cf = cf
         self.box_coder = box_coder
         self.resize = resize
         self.transform = transform
         self.preprocess = preprocess
+        self.resize_process = resize_process
         self.num_images = num_images
         self.boxes = []
         self.labels = []
@@ -53,12 +54,14 @@ class fromFileDatasetDetection(Data_loader):
         labels = self.labels[idx].clone()
         if self.transform is not None:
             img, boxes, labels = self.transform(img, boxes, labels)
+        if self.resize_process is not None:
+            img, boxes, size = self.resize_process(img, boxes)
         if self.preprocess is not None:
             img = self.preprocess(img)
         if self.box_coder is not None:
             boxes, labels = self.box_coder.encode(boxes, labels)
         if self.valid:
-            return img, boxes, labels, gt_path
+            return img, boxes, labels, gt_path, size
         return img, boxes, labels
 
     def update_indexes(self, num_images=None, valid=False):

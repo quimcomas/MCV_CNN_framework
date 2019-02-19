@@ -5,6 +5,7 @@ import numpy as np
 import os
 import cv2 as cv
 import operator
+import math
 import torch
 from PIL import Image
 from torch.autograd import Variable
@@ -44,7 +45,7 @@ class Detection_Manager(SimpleTrainer):
                 self.compute_gradients()
 
                 # Compute batch stats
-                self.train_loss.update(float(self.loss.cpu().data[0]), N)
+                self.train_loss.update(float(self.loss[0].cpu().data[0]), N)
                 # confm = compute_confusion_matrix(predictions, self.labels.cpu().data.numpy(), self.cf.num_classes,
                 #                                  self.cf.void_class)
                 # self.confm_list = map(operator.add, self.confm_list, confm)
@@ -76,8 +77,7 @@ class Detection_Manager(SimpleTrainer):
 
                 # Early stopping checking
                 if self.cf.early_stopping:
-                    early_Stopping.check(self.stats.train.loss, self.stats.val.loss, self.stats.val.mIoU,
-                                         self.stats.val.acc)
+                    early_Stopping.check(self.stats.train.loss, self.stats.val.AP)
                     if early_Stopping.stop == True:
                         self.stop = True
 
@@ -87,7 +87,7 @@ class Detection_Manager(SimpleTrainer):
 
         def compute_gradients(self):
             self.loss = self.model.loss(self.loc_preds, self.loc_targets, self.cls_preds, self.cls_targets)
-            self.loss.backward()
+            self.loss[0].backward()
             self.model.optimizer.step()
 
         def update_messages(self, epoch, epoch_time, new_best):
@@ -96,18 +96,35 @@ class Detection_Manager(SimpleTrainer):
             self.logger_stats.write('\t Epoch step finished: %ds \n' % (epoch_time))
 
             # Compute best stats
-            self.msg.msg_stats_last = '\nLast epoch: loss = %.5f' % (self.stats.val.loss)
+            self.msg.msg_stats_last = '\nLast epoch: loss = %.5f, mean_AP = %.2f' % (self.stats.val.loss, self.stats.val.AP)
             for label in range(len(self.cf.labels)):
                 self.msg.msg_stats_last += ', AP_%s %.2f' % (self.cf.labels[label], self.stats.val.AP_perclass[label])
             if new_best:
-                self.msg.msg_stats_best = '\n Best case [%s]: epoch = %d, loss = %.5f' % (
+                self.msg.msg_stats_best = '\n Best case [%s]: epoch = %d, avg_loss = %.5f' % (
                                           self.cf.save_condition,epoch, self.stats.val.loss)
                 for label in range(len(self.cf.labels)):
-                    self.msg.msg_stats_last += ', AP_%s %.2f' % (
+                    self.msg.msg_stats_best += ', AP_%s %.2f' % (
                     self.cf.labels[label], self.stats.val.AP_perclass[label])
                 # msg_confm = self.stats.val.get_confm_str()
                 # self.logger_stats.write(msg_confm)
                 # self.msg.msg_stats_best = self.msg.msg_stats_best + '\nConfusion matrix:\n' + msg_confm
+
+        def update_epoch_messages(self, epoch_bar, global_bar, train_num_batches, epoch, batch):
+            # Update progress bar
+            epoch_bar.set_msg('loc_loss = %.5f, cls_loss = %.5f, batch_loss = %.5f, avg_loss = %.5f' %
+                              (self.loss[1], self.loss[2], float(self.loss[0].cpu().data[0]), self.stats.train.loss))
+            self.msg.last_str = epoch_bar.get_message(step=True)
+            global_bar.set_msg(self.msg.accum_str + self.msg.last_str + self.msg.msg_stats_last + \
+                               self.msg.msg_stats_best)
+            global_bar.update()
+
+            # writer.add_scalar('train_loss', train_loss.avg, curr_iter)
+
+            # Display progress
+            curr_iter = (epoch - 1) * train_num_batches + batch + 1
+            if (batch + 1) % math.ceil(train_num_batches / 20.) == 0:
+                self.logger_stats.write('[Global iteration %d], [iter %d / %d], [train loss %.5f] \n' % (
+                    curr_iter, batch + 1, train_num_batches, self.stats.train.loss))
 
         def compute_stats(self, confm_list, train_loss):
             # TP_list, TN_list, FP_list, FN_list = extract_stats_from_confm(confm_list)
@@ -143,7 +160,7 @@ class Detection_Manager(SimpleTrainer):
                 val_epoch_images = open(os.path.join(save_folder, "val_epoch_images.txt"), 'w')
             for vi, data in enumerate(valid_loader):
                 # Read data
-                inputs, loc_targets, cls_targets, gt_path = data
+                inputs, loc_targets, cls_targets, gt_path, size = data
                 n_images, _, _, _ = inputs.size()
                 img_name = gt_path[0].split('/')[-1].split('.')[0]
                 inputs = Variable(inputs).cuda()
@@ -161,7 +178,7 @@ class Detection_Manager(SimpleTrainer):
                     box_preds, label_preds, score_preds = self.model.box_coder.decode(
                         loc_preds.cpu().data.squeeze(),
                         F.softmax(cls_preds.squeeze(), dim=1).cpu().data,
-                        score_thresh=0.5)
+                        score_thresh=0.25)
                     if len(box_preds) > 0:
                         box_preds = box_preds.cpu().numpy()
                         label_preds = label_preds.cpu().numpy()
@@ -170,13 +187,15 @@ class Detection_Manager(SimpleTrainer):
                         # print(label_preds.size)
                         # print(score_preds.size)
                         for det in range(len(box_preds)):
-                            f.write(self.cf.labels[label_preds[det]] + ' ' + str(0) + ' ' + str(0) + ' ' + '-10' + ' ' \
-                                    + str(box_preds[det][0]) + ' ' + str(box_preds[det][1]) + ' ' \
-                                    + str(box_preds[det][2]) + ' ' + str(box_preds[det][3]) + ' ' \
-                                    + '-1 -1 -1 -1000 -1000 -1000 ' \
-                                    + '-1000 ' \
-                                    + str(score_preds[det]) + '\n'
-                                    )
+                            if score_preds[det] >= 0:
+                                box_preds[det] = box_preds[det] / [size[0], size[1], size[0], size[1]]
+                                f.write(self.cf.labels[label_preds[det]] + ' ' + str(0) + ' ' + str(0) + ' ' + '-10' + ' ' \
+                                        + str(box_preds[det][0]) + ' ' + str(box_preds[det][1]) + ' ' \
+                                        + str(box_preds[det][2]) + ' ' + str(box_preds[det][3]) + ' ' \
+                                        + '-1 -1 -1 -1000 -1000 -1000 ' \
+                                        + '-1000 ' \
+                                        + str(score_preds[det]) + '\n'
+                                        )
                     f.close()
                     if epoch is not None:
                         val_epoch_images.write(gt_path[0] + '\n')
@@ -202,12 +221,15 @@ class Detection_Manager(SimpleTrainer):
 
                 # Update messages
                 self.update_msg(bar, global_bar)
-
-            val_epoch_images.close()
             # Calculate stats for detection
             # extern kitti evaluation call
-            evaluation_bash_comand = "./devkit_kitti_txt/cpp/evaluate_object_txt %s %s %s" % (
-                self.cf.temp_folder, os.path.join(self.cf.temp_folder,"val_epoch_images.txt"), self.cf.temp_folder)
+            if epoch is not None:
+                val_epoch_images.close()
+                evaluation_bash_comand = "./devkit_kitti_txt/cpp/evaluate_object_txt %s %s %s" % (
+                    self.cf.temp_folder, os.path.join(self.cf.temp_folder,"val_epoch_images.txt"), self.cf.temp_folder)
+            else:
+                evaluation_bash_comand = "./devkit_kitti_txt/cpp/evaluate_object_txt %s %s %s" % (
+                    self.cf.predict_path_output, self.cf.valid_gt_txt, self.cf.predict_path_output)
             process = subprocess.Popen(evaluation_bash_comand, shell=True)
             process.communicate()
 
@@ -217,6 +239,7 @@ class Detection_Manager(SimpleTrainer):
                 scores = Compute_kitti_AP(os.path.join(self.cf.temp_folder,"stats_%s_detection.txt" %(label.lower())))
                 # print scores
                 self.stats.val.AP_perclass.append(scores[1])
+            self.stats.val.AP = np.mean(np.asarray(self.stats.val.AP_perclass, dtype=np.float32))
             if val_loss is not None:
                 self.stats.val.loss = val_loss.avg
 
