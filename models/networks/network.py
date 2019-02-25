@@ -82,7 +82,7 @@ class Net(nn.Module):
             else:
                 model_dict[k] = v
 
-        super(Net, self).load_state_dict2(model_dict)
+        super(Net, self).load_state_dict(model_dict)
 
     def restore_weights2(self, filename):
         print('\t Restoring weight from ' + filename)
