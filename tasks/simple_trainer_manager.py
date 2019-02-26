@@ -280,7 +280,7 @@ class SimpleTrainer(object):
                     predictions = outputs.data.max(1)[1].cpu().numpy()
 
                     # Compute batch stats
-                    self.val_loss.update(float(self.model.loss(outputs, gts).cpu().data[0] / n_images), n_images)
+                    self.val_loss.update(float(self.model.loss(outputs, gts).cpu().item() / n_images), n_images)
                     confm = compute_confusion_matrix(predictions, gts.cpu().data.numpy(), self.cf.num_classes,
                                                      self.cf.void_class)
                     confm_list = map(operator.add, confm_list, confm)
