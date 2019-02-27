@@ -8,10 +8,10 @@ The goal of this project is to learn the basic concepts and technniques related 
 
 ### About us
 
-Zuzanna Szafranowska (zuzannamaria.szafranowska@e-campus.uab.cat)
-Grzegorz Skorupko (grzegorzkarol.skorupko@e-campus.uab.cat)
-Claudia Baca (claudiabaca.perez@e-campus.uab.cat)
-Quim Comas (joaquim.comas@e-campus.uab.cat)
+- Zuzanna Szafranowska (zuzannamaria.szafranowska@e-campus.uab.cat)
+- Grzegorz Skorupko (grzegorzkarol.skorupko@e-campus.uab.cat)
+- Claudia Baca (claudiabaca.perez@e-campus.uab.cat)
+- Quim Comas (joaquim.comas@e-campus.uab.cat)
 
 ### Project report
 
