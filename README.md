@@ -19,5 +19,5 @@ Overleaf link here
 
 ### Summaries
 
-[VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
+- [VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
 
