@@ -16,5 +16,5 @@ About the classification experiments they used:
 -	Multi-scale evaluation where the model was run over several rescaled versions of each test image. The best results were 24.8 % in top-1 error and 7.5 % in top-5 error.    
 -	Multi-crop evaluation where the model was run over multiple crops of each test image. The best results were 24.4 % in top-1 error and 7.1 % in top-5 error.    
 
-Finally, they combined the output of several models by averaging their soft-max class posteriors. In the case of the D and E networks they achieved a 23.7 in top-1 error and 6.8% in top-5 error.   
+Finally, they combined the output of several models by averaging their soft-max class posteriors. In the case of the D and E networks, they achieved a 23.7 in top-1 error and 6.8% in top-5 error.   
 
