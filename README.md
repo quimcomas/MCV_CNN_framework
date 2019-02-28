@@ -17,3 +17,7 @@ The goal of this project is to learn the basic concepts and technniques related 
 
 Overleaf link here
 
+### Summaries
+
+[VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
+
