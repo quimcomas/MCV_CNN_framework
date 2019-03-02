@@ -15,9 +15,9 @@ The goal of this project is to learn the basic concepts and technniques related 
 
 ### Project report
 
-Overleaf link here
+Overleaf link [here](https://www.overleaf.com/read/ntnzrqmzszhv)
 
 ### Summaries
 
 - [VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
-
+- [SqueezeAndExcitation](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/SqueezeNet.md)
