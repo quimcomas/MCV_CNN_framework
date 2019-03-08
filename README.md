@@ -12,6 +12,7 @@ The goal of this project is to learn the basic concepts and technniques related 
 - Grzegorz Skorupko (grzegorzkarol.skorupko@e-campus.uab.cat)
 - Claudia Baca (claudiabaca.perez@e-campus.uab.cat)
 - Quim Comas (joaquim.comas@e-campus.uab.cat)
+- Raül Duaigües (raul.duaigues@e-campus.uab.cat)
 
 ### Project report
 
