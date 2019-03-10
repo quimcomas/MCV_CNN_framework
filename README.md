@@ -18,6 +18,10 @@ The goal of this project is to learn the basic concepts and technniques related 
 
 Overleaf link [here](https://www.overleaf.com/read/ntnzrqmzszhv)
 
+### Project Slides
+
+Google slides link [here](https://docs.google.com/presentation/d/1Go_nup-Z3y36y8_xZ2Iny4ThMHF-Z0mZiLGWd8Am1eo/edit#slide=id.p)
+
 ### Summaries
 
 - [VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
