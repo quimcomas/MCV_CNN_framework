@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 85, in start
+    self.training_loop(epoch, train_loader, epoch_bar)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 129, in training_loop
+    self.outputs = self.model.net(inputs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/M5/Code/models/networks/classification/Inception.py", line 29, in forward
+    return self.model.forward(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/models/inception.py", line 113, in forward
+    aux = self.AuxLogits(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/models/inception.py", line 313, in forward
+    x = self.conv1(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/models/inception.py", line 333, in forward
+    x = self.conv(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/conv.py", line 320, in forward
+    self.padding, self.dilation, self.groups)
+RuntimeError: cuDNN error: CUDNN_STATUS_BAD_PARAM
+slurmstepd: error: *** JOB 28870 ON etse-75-51 CANCELLED AT 2019-03-09T18:14:41 ***

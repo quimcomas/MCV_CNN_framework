@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 15, in main
+    cf = config.Load()
+  File "/home/grupo03/M5/Code/config/configuration.py", line 66, in Load
+    os.makedirs(cf.output_model_path)
+  File "/usr/lib/python2.7/os.py", line 150, in makedirs
+    makedirs(head, mode)
+  File "/usr/lib/python2.7/os.py", line 157, in makedirs
+    mkdir(name, mode)
+OSError: [Errno 13] Permission denied: '/text_experiment'

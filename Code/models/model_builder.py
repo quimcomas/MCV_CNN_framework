@@ -14,6 +14,12 @@ from models.networks.segmentation.deeplabv2_resnet import MS_Deeplab
 from models.networks.detection.ssd import SSD300
 from models.networks.detection.ssd import SSD512
 from models.networks.classification.VGG16 import VGG16
+from models.networks.classification.ResNet import ResNet,BasicBlock,Bottleneck
+from models.networks.classification.ResNet101 import ResNet101
+from models.networks.classification.Inception import Inceptionv3
+from models.networks.classification.ScratchNet import ScratchNet
+
+
 # from models.networks.detection.rpn import RPN
 from models.loss.loss_builder import Loss_Builder
 from models.optimizer.optimizer_builder import Optimizer_builder
@@ -39,7 +45,7 @@ class Model_builder():
         if self.cf.model_type.lower() == 'densenetfcn':
             self.net = FCDenseNet(self.cf, nb_layers_per_block=self.cf.model_layers,
                                 growth_rate=self.cf.model_growth,
-                                nb_dense_block=self.cf.model_blocks, 
+                                nb_dense_block=self.cf.model_blocks,
                                 n_channel_start=48,
                                 n_classes=self.cf.num_classes,
                                 drop_rate=0, bottle_neck=False).cuda()
@@ -65,6 +71,15 @@ class Model_builder():
         # classification networks
         elif self.cf.model_type.lower() == 'vgg16':
             self.net = VGG16(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'scratchnet':
+            self.net = ScratchNet(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+
+        elif self.cf.model_type.lower() == 'resnet':
+            self.net = ResNet(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'resnet101':
+            self.net = ResNet101(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+        elif self.cf.model_type.lower() == 'inception':
+            self.net = Inceptionv3(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
         else:
             raise ValueError('Unknown model')
 

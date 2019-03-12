@@ -1,0 +1,6 @@
+['Car', 'Cyclist', 'Pedestrian', 'Person_sitting', 'Tram', 'Truck', 'Van', 'background']
+   Saving file: KITTI_txt/train_images.txt
+['Car', 'Cyclist', 'Pedestrian', 'Person_sitting', 'Tram', 'Truck', 'Van', 'background']
+   Saving file: KITTI_txt/valid_images.txt
+[]
+   Saving file: KITTI_txt/test_images.txt

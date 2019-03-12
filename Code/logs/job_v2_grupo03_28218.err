@@ -1,0 +1,17 @@
+stty: 'entrada estándar': Función ioctl no apropiada para el dispositivo
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 85, in start
+    self.training_loop(epoch, train_loader, epoch_bar)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 151, in training_loop
+    self.update_epoch_messages(epoch_bar, self.global_bar, self.train_num_batches, epoch, i)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 218, in update_epoch_messages
+    global_bar.update()
+  File "/home/grupo03/M5/Code/utils/ProgressBar.py", line 55, in update
+    msg_list, msg_lens = self.__split_msg(msg_endl)
+  File "/home/grupo03/M5/Code/utils/ProgressBar.py", line 98, in __split_msg
+    rows, columns = os.popen('stty size', 'r').read().split()
+ValueError: need more than 0 values to unpack

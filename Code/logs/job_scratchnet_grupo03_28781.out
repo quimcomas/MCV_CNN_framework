@@ -1,0 +1,9 @@
+Loading configuration ...
+load basic weights
+NOT downloading file
+	 Restoring weight from ./pretrained_model/basic_vgg16.pth
+	 WARNING: Could not load layer classifier.6.weight with shape: torch.Size([1000, 4096]) and torch.Size([45, 4096])
+	 WARNING: Could not load layer classifier.6.bias with shape: torch.Size([1000]) and torch.Size([45])
+0.1
+<type 'float'>
+	 Images from: /datatmp/Datasets/classification/tsinghua_cropped/cropped_data/ge100_train_rgb.txt

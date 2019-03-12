@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 23, in main
+    model.build()
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 73, in build
+    self.net = ResNet(self.cf, num_classes=self.cf.num_classes, pretrained=self.cf.basic_pretrained_model).cuda()
+  File "/home/grupo03/M5/Code/models/networks/classification/ResNet.py", line 17, in __init__
+    if(cf.block=='BasicBlock'):
+AttributeError: 'EasyDict' object has no attribute 'block'
