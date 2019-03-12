@@ -1,0 +1,99 @@
+# Problem type
+problem_type                : 'classification' # Option: ['segmentation','classification']
+
+# Model
+model_type                  : 'VGG16'   # Options: ['DenseNetFCN', 'FCN8']
+
+### load/store options
+resume_experiment           : True
+pretrained_model            : 'custom'  # 'None': from scratch, 'basic': pretraned from imagenet, 'custom': personal model
+input_model_path            : './weights/basic_vgg16.pth' # Path and pretrained file to load [None uses experiment path and model name by default]
+load_weight_only            : True  # Recomended true, loads only weights and parameters
+
+### Save options
+save_weight_only            : True  # Recomended true, stores only weights and parameters
+model_name                  : 'VGG16'  # Name of the model to store
+output_model_path           : null  # Path to store the model using model_name [None uses the default experiment path]
+basic_models_path           : null
+
+# Loss type
+loss_type                   : 'cross_entropy_classification' # options: ['cross_entropy_segmentation','focal_segmentation']
+normalize_loss              : True
+
+# General parameters
+
+train_samples               : -1
+#-1 uses all the data available inside the dataset files
+valid_samples               : -1
+#-1 uses all the data available inside the dataset files
+test_samples                : -1
+#-1 uses all the data available inside the dataset files
+train_batch_size            : 40
+valid_batch_size            : 40
+test_batch_size             : 40
+train                       : True
+validation                  : True
+test                        : False # Calculate metrics on test giving the gt
+predict_test                : False # True when you want to generate predictions from test, doesn't need gt
+predict_path_output         : null # null uses the default output in the experiment folder /predictions
+
+# Image properties
+size_image_test             : null
+resize_image_train          : !!python/tuple [224, 224]
+resize_image_valid          : !!python/tuple [224, 224]
+resize_image_test           : !!python/tuple [224, 224]
+crop_train                  : null
+grayscale                   : False #Use this option to convert to rgb a grascale dataset
+
+# Dataset properties
+
+train_images_txt            : '/home/grupo03/M5/Code/BTS_txt/train_images.txt'
+train_gt_txt                : '/home/grupo03/M5/Code/BTS_txt/train_gt.txt'
+valid_images_txt            : '/home/grupo03/M5/Code/BTS_txt/valid_images.txt'
+valid_gt_txt                : '/home/grupo03/M5/Code/BTS_txt/valid_gt.txt'
+test_images_txt             : '/home/grupo03/M5/Code/BTS_txt/test_images.txt'
+test_gt_txt                 : '/home/grupo03/M5/Code/BTS_txt/test_gt.txt'
+
+labels                      : !!python/tuple ['00000', '00001', '00002', '00003', '00004', '00005', '00006', '00007', '00008', '00009', '00010', '00011', '00012','00013','00014','00015','00016','00017','00018','00019','00020','00021','00022','00023','00024','00025','00026','00027','00028','00029','00030','00031','00032','00033','00034','00035','00036','00037','00038','00039','00040','00041','00042','00043','00044','00045','00046','00047','00048','00049','00050','00051','00052','00053','00054','00055','00056','00057','00058','00059','00060','00061']
+map_labels                  : !!python/dict {'00000': 0, '00001': 1, '00002': 2, '00003': 3, '00004': 4, '00005': 5, '00006': 6, '00007': 7, '00008': 8, '00009': 9, '00010': 10, '00011': 11, '00012': 12, '00013': 13, '00014': 14, '00015': 15, '00016': 16, '00017': 17, '00018': 18, '00019': 19, '00020': 20, '00021': 21, '00022': 22, '00023': 23, '00024': 24, '00025': 25, '00026': 26, '00027': 27, '00028': 28, '00029': 29, '00030': 30, '00031': 31, '00032': 32, '00033': 33, '00034': 34, '00035': 35, '00036': 36, '00037': 37, '00038': 38, '00039': 39, '00040': 40, '00041': 41, '00042': 42, '00043': 43, '00044': 44, '00045': 45, '00046': 46, '00047': 47, '00048': 48, '00049': 49, '00050': 50, '00051': 51, '00052': 52, '00053': 53, '00054': 54, '00055': 55, '00056': 56, '00057': 57, '00058': 58, '00059': 59, '00060': 60, '00061': 61}
+
+num_classes                 : 62
+shuffle                     : True
+void_class                  : 255 #void id or value on the image
+
+# Training
+epochs                      : 40 #Max number of epochs
+initial_epoch               : 1 #Defines the starting epoch number
+valid_samples_epoch         : -1 # Number of validation images used to validate an epoch
+is_training                 : True
+    ### Optimizer ###
+optimizer                   : 'SGD'
+momentum1                   : 0.99
+momentum2                   : 0.99
+learning_rate               : 1.0e-5
+learning_rate_bias          : 1.0e-5
+weight_decay                : 5.0e-4
+    ### Scheduler
+scheduler                   : 'MultiStep' #['ReduceLROnPlateau','Step','MultiStep','Exponential', None]
+decay                       : 0.1 #Learnng rate decay to apply (lr*decay)
+sched_patience              : 5 # ReduceLROnPlateau option: epoch patience without loss change until a lr decrement
+step_size                   : 20 #Step option: epoch counter to decrease lr
+milestone                   : !!python/tuple [10] #MultiStep option: define different milestones (epochs) to decrease lr
+    ### Save criteria
+save_condition              : 'f1_score' # ['always','(x)_loss','(x)_mAcc','(x)_mIoU'] x : valid or train_loss
+    ### Early Stopping
+early_stopping              : False
+stop_condition              : 'f1_score' # [(x)_loss','(x)_mAcc','(x)_mIoU'] x : valid or train_loss
+patience                    : 5
+
+# Image preprocess
+rescale                     : 1.
+mean                        : !!python/tuple [127.5,127.5,127.5] #[104.00698793, 116.66876762, 122.67891434] #[103.939, 116.779, 123.68] #[0.28689553, 0.32513301, 0.28389176] #[0.37296272, 0.37296272, 0.37296272]
+std                         : !!python/tuple [1.,1.,1.] #[0.18696375, 0.19017339, 0.18720214]#[0.21090189, 0.21090189, 0.21090189]
+
+# Data augmentation
+hflips                      : False
+random_dist                 : False  # Activate random distortions to the input image [brightness, contrast, saturation]
+
+color_map                   : null
+num_images                  : null
