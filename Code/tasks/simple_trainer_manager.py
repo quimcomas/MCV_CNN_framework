@@ -264,7 +264,7 @@ class SimpleTrainer(object):
             elif mode == 'Validation':
                 self.logger_stats.write_stat(self.stats.val, epoch, self.cf.val_json_file)
             elif mode == 'Test':
-                self.logger_stats.write_stat(self.stats.test, epoch, self.cf.test_json_file)
+                self.logger_stats.write_stat(self.stats.val, epoch, self.cf.test_json_file)
 
         def validation_loop(self, epoch, valid_loader, valid_set, bar, global_bar, confm_list):
             for vi, data in enumerate(valid_loader):

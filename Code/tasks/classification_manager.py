@@ -83,7 +83,7 @@ class Classification_Manager(SimpleTrainer):
                 self.writer.add_scalar('metrics/recall', 100.*self.stats.train.recall, epoch)
                 self.writer.add_scalar('metrics/f1score', 100.*self.stats.train.f1score, epoch)
                 conf_mat_img = confm_metrics2image(self.stats.train.get_confm_norm(), self.cf.labels)
-                self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
+                #self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
 
 
     class validation(SimpleTrainer.validation):
@@ -121,7 +121,7 @@ class Classification_Manager(SimpleTrainer):
                 self.writer.add_scalar('metrics/recall', 100.*self.stats.val.recall, epoch)
                 self.writer.add_scalar('metrics/f1score', 100.*self.stats.val.f1score, epoch)
                 conf_mat_img = confm_metrics2image(self.stats.val.get_confm_norm(), self.cf.labels)
-                self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
+                #self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
             else:
                 self.logger_stats.write('----------------- Scores summary --------------------\n')
                 self.logger_stats.write(

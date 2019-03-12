@@ -1,0 +1,11 @@
+
+ ---------- Init experiment: prova_18 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 5991s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 35s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 433s 
+- Experiment finished: 6470s 

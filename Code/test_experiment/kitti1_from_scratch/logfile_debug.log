@@ -1,0 +1,7 @@
+
+ ---------- Init experiment: kitti1_from_scratch ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 24551s 
+- Starting validation <---	 Validation step finished: 45s 
+- Experiment finished: 24607s 
