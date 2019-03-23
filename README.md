@@ -26,3 +26,4 @@ Google slides link [here](https://docs.google.com/presentation/d/1Go_nup-Z3y36y8
 
 - [VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
 - [SqueezeAndExcitation](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/SqueezeNet.md)
+- [Unet](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/Unet.md)
