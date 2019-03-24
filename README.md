@@ -24,6 +24,20 @@ Google slides link [here](https://docs.google.com/presentation/d/1Go_nup-Z3y36y8
 
 ### Week 2
 
+The goal of this week 2 is to learn to classify images using state of the art neural networks. To evaluate and perform our image classifition we used two main datasets:
+
+- Tsinghua-Tencent 100K (TT100K)
+- Kitti 
+
+Tasks done during these weeks:
+
+- [x] Run the provided code (analize the dataset and evaluate on train, validation and test set). 
+- [x] Read two papers and summarize them (VGG and SqueezeNet). 
+- [x] Implement a new network using an existing implementation (Resnet152 implementation).
+- [x] Train our networks for another dataset (we used kitti dataset).
+- [x] Boost the performance of our network (we boosted the performance of Resnet152).
+
+
 #### Summaries
 
 - [VGG](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/VGG.md)
