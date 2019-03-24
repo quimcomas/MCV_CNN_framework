@@ -1,3 +1,0 @@
-slurmstepd: error: Job 28824 exceeded memory limit (10650280 > 10240000), being killed
-slurmstepd: error: Exceeded job memory limit
-slurmstepd: error: *** JOB 28824 ON etse-75-51 CANCELLED AT 2019-03-09T16:56:41 ***
