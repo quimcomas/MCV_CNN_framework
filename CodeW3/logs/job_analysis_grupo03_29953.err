@@ -1,0 +1,2 @@
+pixel_analysis.py:16: RuntimeWarning: invalid value encountered in divide
+  norm_pixels_class = pixels_class / sum(pixels_class)

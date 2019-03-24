@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "GRAY_2_RGB.py", line 17, in <module>
+    plt.imshow(image_RGB)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 3210, in imshow
+    **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/__init__.py", line 1867, in inner
+    return func(ax, *args, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/axes/_axes.py", line 5501, in imshow
+    im.set_data(X)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/image.py", line 642, in set_data
+    raise TypeError("Image data cannot be converted to float")
+TypeError: Image data cannot be converted to float

@@ -1,0 +1,6 @@
+['depths', 'images', 'masks']
+   Saving file: synthia_txt_seg/train_images.txt
+['depths', 'images', 'masks']
+   Saving file: synthia_txt_seg/valid_images.txt
+['depths', 'images', 'masks']
+   Saving file: synthia_txt_seg/test_images.txt

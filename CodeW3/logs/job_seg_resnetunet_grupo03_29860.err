@@ -1,0 +1,12 @@
+Downloading: "https://download.pytorch.org/models/resnet18-5c106cde.pth" to /home/grupo03/.torch/models/resnet18-5c106cde.pth
+  0%|          | 0/46827520 [00:00<?, ?it/s]  0%|          | 40960/46827520 [00:00<03:25, 227389.82it/s]  1%|          | 237568/46827520 [00:00<02:30, 309484.84it/s]  1%|          | 507904/46827520 [00:00<01:49, 421344.01it/s]  2%|▏         | 1064960/46827520 [00:00<01:20, 570125.60it/s]  5%|▌         | 2547712/46827520 [00:00<00:55, 801254.81it/s] 10%|█         | 4784128/46827520 [00:00<00:37, 1127334.50it/s] 20%|██        | 9592832/46827520 [00:00<00:23, 1594439.96it/s] 32%|███▏      | 14942208/46827520 [00:00<00:14, 2249036.64it/s] 44%|████▍     | 20717568/46827520 [00:01<00:08, 3160133.47it/s] 55%|█████▌    | 25853952/46827520 [00:01<00:04, 4398447.58it/s] 68%|██████▊   | 31858688/46827520 [00:01<00:02, 6092075.38it/s] 79%|███████▉  | 37150720/46827520 [00:01<00:01, 8293621.35it/s] 91%|█████████ | 42442752/46827520 [00:01<00:00, 11101829.50it/s]100%|██████████| 46827520/46827520 [00:01<00:00, 29892300.41it/s]
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 23, in main
+    model.build()
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 115, in build
+    self.net.load_basic_weights()
+  File "/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/nn/modules/module.py", line 518, in __getattr__
+    type(self).__name__, name))
+AttributeError: 'ResNetUNet' object has no attribute 'load_basic_weights'

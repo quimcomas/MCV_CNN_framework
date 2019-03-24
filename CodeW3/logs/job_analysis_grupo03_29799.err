@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "pixel_analysis.py", line 4, in <module>
+    matplotlib.use('Agg')
+NameError: name 'matplotlib' is not defined

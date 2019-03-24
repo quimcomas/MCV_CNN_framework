@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "dataset_2_text.py", line 80, in <module>
+    main()
+  File "dataset_2_text.py", line 70, in main
+    from_images_to_txt(directory+'/train', outDirectory+'/train')
+  File "dataset_2_text.py", line 30, in from_images_to_txt
+    for subdir in sorted(os.listdir(directory)):
+OSError: [Errno 2] No such file or directory: '/home/mcv/datasets/M5/segmentation/KITTI//train'

@@ -1,0 +1,6 @@
+['color', 'images', 'instanceIds', 'labelIds', 'masks', 'polygons']
+   Saving file: city_txt_seg/train_images.txt
+['color', 'images', 'instanceIds', 'labelIds', 'masks', 'polygons']
+   Saving file: city_txt_seg/valid_images.txt
+['color', 'images', 'instanceIds', 'labelIds', 'masks', 'polygons']
+   Saving file: city_txt_seg/test_images.txt

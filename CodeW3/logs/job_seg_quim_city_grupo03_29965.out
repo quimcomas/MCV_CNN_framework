@@ -1,0 +1,19 @@
+Loading configuration ...
+load basic weights
+NOT downloading file
+	 Restoring weight from ./pretrained_models/basic_fcn8atonce.pth
+	 WARNING: Could not load layer score_fr.weight with shape: torch.Size([21, 4096, 1, 1]) and torch.Size([19, 4096, 1, 1])
+	 WARNING: Could not load layer score_fr.bias with shape: torch.Size([21]) and torch.Size([19])
+	 WARNING: Could not load layer score_pool3.weight with shape: torch.Size([21, 256, 1, 1]) and torch.Size([19, 256, 1, 1])
+	 WARNING: Could not load layer score_pool3.bias with shape: torch.Size([21]) and torch.Size([19])
+	 WARNING: Could not load layer score_pool4.weight with shape: torch.Size([21, 512, 1, 1]) and torch.Size([19, 512, 1, 1])
+	 WARNING: Could not load layer score_pool4.bias with shape: torch.Size([21]) and torch.Size([19])
+	 WARNING: Could not load layer upscore2.weight with shape: torch.Size([21, 21, 4, 4]) and torch.Size([19, 19, 4, 4])
+	 WARNING: Could not load layer upscore8.weight with shape: torch.Size([21, 21, 16, 16]) and torch.Size([19, 19, 16, 16])
+	 WARNING: Could not load layer upscore_pool4.weight with shape: torch.Size([21, 21, 4, 4]) and torch.Size([19, 19, 4, 4])
+	 Images from: /home/grupo03/M5/Code/city_txt_seg/train_images.txt
+	 Gt from: /home/grupo03/M5/Code/city_txt_seg/train_labels.txt
+	 Images found: 2975
+	 Images from: /home/grupo03/M5/Code/city_txt_seg/valid_images.txt
+	 Gt from: /home/grupo03/M5/Code/city_txt_seg/valid_labels.txt
+	 Images found: 500

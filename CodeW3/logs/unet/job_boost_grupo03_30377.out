@@ -1,0 +1,7 @@
+Loading configuration ...
+	 Images from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_train_images.txt
+	 Gt from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_train_gt.txt
+	 Images found: 15196
+	 Images from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_valid_images.txt
+	 Gt from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_valid_gt.txt
+	 Images found: 740

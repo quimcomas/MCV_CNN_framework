@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 23, in main
+    model.build()
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 92, in build
+    self.net = FastNet(self.cf, n_classes=self.cf.num_classes,
+NameError: global name 'FastNet' is not defined

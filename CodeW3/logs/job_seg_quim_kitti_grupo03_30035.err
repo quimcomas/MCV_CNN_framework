@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 44, in main
+    if cf.valid_images_txt is not None and cf.valid_gt_txt is not None and cf.valid_samples_epoch != 0:
+AttributeError: 'EasyDict' object has no attribute 'valid_images_txt'

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "pixel_analysis.py", line 43, in <module>
+    [image for image in os.listdir(validation_path) if os.path.isfile(os.path.join(validation_path, image))])
+OSError: [Errno 2] No such file or directory: '/home/mcv/datasets/M5/segmentation/synthia_rand_cityscapess/valid/masks'

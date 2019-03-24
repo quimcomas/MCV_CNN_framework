@@ -1,0 +1,10 @@
+Loading configuration ...
+load basic weights
+NOT downloading file
+	 Restoring weight from ./pretrained_models/basic_fcn8atonce.pth
+	 Images from: /home/grupo03/M5/Code/pascal_txt_seg/train_images.txt
+	 Gt from: /home/grupo03/M5/Code/pascal_txt_seg/train_labels.txt
+	 Images found: 1464
+	 Images from: /home/grupo03/M5/Code/pascal_txt_seg/valid_images.txt
+	 Gt from: /home/grupo03/M5/Code/pascal_txt_seg/valid_labels.txt
+	 Images found: 1449

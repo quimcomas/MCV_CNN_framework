@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "GRAY_2_RGB.py", line 16, in <module>
+    plt.imshow(image_RGB)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 3194, in imshow
+    ax = gca()
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 969, in gca
+    return gcf().gca(**kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 586, in gcf
+    return figure()
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 533, in figure
+    **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/backend_bases.py", line 161, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/backends/_backend_tk.py", line 1046, in new_figure_manager_given_figure
+    window = Tk.Tk(className="matplotlib")
+  File "/home/grupo03/anaconda3/lib/python2.7/lib-tk/Tkinter.py", line 1815, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: no display name and no $DISPLAY environment variable

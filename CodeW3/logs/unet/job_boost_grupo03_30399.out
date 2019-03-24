@@ -1,0 +1,7 @@
+Loading configuration ...
+	 Images from: /home/mcv/datasets/M5/segmentation/camvid/train_images.txt
+	 Gt from: /home/mcv/datasets/M5/segmentation/camvid/train_labels.txt
+	 Images found: 367
+	 Images from: /home/mcv/datasets/M5/segmentation/camvid/val_images.txt
+	 Gt from: /home/mcv/datasets/M5/segmentation/camvid/val_labels.txt
+	 Images found: 101

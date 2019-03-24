@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "pixel_analysis.py", line 52, in <module>
+    num_test = len([image for image in os.listdir(test_path) if os.path.isfile(os.path.join(test_path, image))])
+NameError: name 'test_path' is not defined

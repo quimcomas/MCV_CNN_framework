@@ -1,0 +1,6 @@
+['images', 'masks']
+   Saving file: pascal_txt_seg/train_images.txt
+['images', 'masks']
+   Saving file: pascal_txt_seg/valid_images.txt
+['images', 'masks']
+   Saving file: pascal_txt_seg/test_images.txt

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "dataset_2_text.py", line 75, in <module>
+    main()
+  File "dataset_2_text.py", line 59, in main
+    args = docopt(__doc__)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/docopt.py", line 558, in docopt
+    DocoptExit.usage = printable_usage(doc)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/docopt.py", line 468, in printable_usage
+    raise DocoptLanguageError('"usage:" (case-insensitive) not found.')
+docopt.DocoptLanguageError: "usage:" (case-insensitive) not found.

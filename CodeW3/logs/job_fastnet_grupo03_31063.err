@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 23, in main
+    model.build()
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 114, in build
+    self.net.restore_weights(os.path.join(self.cf.input_model_path))
+  File "/home/grupo03/M5/Code/models/networks/network.py", line 88, in restore_weights
+    self.load_state_dict2(torch.load(filename))
+  File "/home/grupo03/M5/Code/models/networks/network.py", line 93, in load_state_dict2
+    for k, v in pretrained_dict.items():
+AttributeError: Model_builder instance has no attribute 'items'

@@ -1,0 +1,26 @@
+/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/nn/modules/loss.py:206: UserWarning: NLLLoss2d has been deprecated. Please use NLLLoss instead as a drop-in replacement and see http://pytorch.org/docs/master/nn.html#torch.nn.NLLLoss for more details.
+  warnings.warn("NLLLoss2d has been deprecated. "
+/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/nn/functional.py:52: UserWarning: size_average and reduce args will be deprecated, please use reduction='elementwise_mean' instead.
+  warnings.warn(warning.format(ret))
+/home/grupo03/M5/Code/models/loss/segmentation/crossEntropyLoss2d.py:37: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  loss = loss_fn_(F.log_softmax(inputs), targets)
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 102, in start
+    new_best = self.model.save(self.stats)
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 145, in save
+    self.save_model()
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 137, in save_model
+    torch.save(self, os.path.join(self.cf.exp_folder, self.cf.model_name + '.pth'))
+  File "/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/serialization.py", line 209, in save
+    return _with_file_like(f, "wb", lambda f: _save(obj, f, pickle_module, pickle_protocol))
+  File "/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/serialization.py", line 134, in _with_file_like
+    return body(f)
+  File "/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/serialization.py", line 209, in <lambda>
+    return _with_file_like(f, "wb", lambda f: _save(obj, f, pickle_module, pickle_protocol))
+  File "/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/serialization.py", line 282, in _save
+    pickler.dump(obj)
+cPickle.PicklingError: Can't pickle <type 'instancemethod'>: attribute lookup __builtin__.instancemethod failed

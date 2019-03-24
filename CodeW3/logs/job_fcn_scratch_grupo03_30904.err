@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 47, in main
+    cf.resize_image_valid, cf.valid_batch_size)
+  File "/home/grupo03/M5/Code/dataloader/dataloader_builder.py", line 61, in build_valid
+    valid=True)
+  File "/home/grupo03/M5/Code/dataloader/fromFileDatasetSegmentation.py", line 26, in __init__
+    raise ValueError('number of images != number GT images')
+ValueError: number of images != number GT images

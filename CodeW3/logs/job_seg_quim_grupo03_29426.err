@@ -1,0 +1,24 @@
+/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/nn/modules/loss.py:206: UserWarning: NLLLoss2d has been deprecated. Please use NLLLoss instead as a drop-in replacement and see http://pytorch.org/docs/master/nn.html#torch.nn.NLLLoss for more details.
+  warnings.warn("NLLLoss2d has been deprecated. "
+/home/grupo03/anaconda3/lib/python2.7/site-packages/torch/nn/functional.py:52: UserWarning: size_average and reduce args will be deprecated, please use reduction='elementwise_mean' instead.
+  warnings.warn(warning.format(ret))
+/home/grupo03/M5/Code/models/loss/segmentation/crossEntropyLoss2d.py:37: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  loss = loss_fn_(F.log_softmax(inputs), targets)
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 88, in main
+    problem_manager.predictor.start(dataloader.predict_loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 358, in start
+    self.write_results(predictions, img_name, img_shape)
+  File "/home/grupo03/M5/Code/tasks/semanticSegmentator_manager.py", line 140, in write_results
+    predictions = Image.fromarray(predictions.astype(np.uint8),'RGB')
+  File "/home/grupo03/.local/lib/python2.7/site-packages/PIL/Image.py", line 2536, in fromarray
+    return frombuffer(mode, size, obj, "raw", rawmode, 0, 1)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/PIL/Image.py", line 2479, in frombuffer
+    return frombytes(mode, size, data, decoder_name, args)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/PIL/Image.py", line 2412, in frombytes
+    im.frombytes(data, decoder_name, args)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/PIL/Image.py", line 815, in frombytes
+    raise ValueError("not enough image data")
+ValueError: not enough image data

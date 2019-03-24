@@ -1,0 +1,27 @@
+pixel_analysis.py:5: UserWarning: 
+This call to matplotlib.use() has no effect because the backend has already
+been chosen; matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
+or matplotlib.backends is imported for the first time.
+
+The backend was *originally* set to 'TkAgg' by the following code:
+  File "pixel_analysis.py", line 3, in <module>
+    from matplotlib import pyplot as plt
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 71, in <module>
+    from matplotlib.backends import pylab_setup
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/backends/__init__.py", line 17, in <module>
+    line for line in traceback.format_stack()
+
+
+  matplotlib.use('Agg')
+Traceback (most recent call last):
+  File "pixel_analysis.py", line 43, in <module>
+    fig = plt.figure()
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/pyplot.py", line 533, in figure
+    **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/backend_bases.py", line 161, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/matplotlib/backends/_backend_tk.py", line 1046, in new_figure_manager_given_figure
+    window = Tk.Tk(className="matplotlib")
+  File "/home/grupo03/anaconda3/lib/python2.7/lib-tk/Tkinter.py", line 1815, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: no display name and no $DISPLAY environment variable
