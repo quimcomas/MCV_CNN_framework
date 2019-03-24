@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "main.py", line 6, in <module>
+    from models.model_builder import Model_builder
+  File "/home/grupo03/M5/Code/models/model_builder.py", line 20, in <module>
+    from models.networks.classification.ScratchNet import ScratchNet
+  File "/home/grupo03/M5/Code/models/networks/classification/ScratchNet.py", line 9, in <module>
+    class ScratchNet(Net):
+  File "/home/grupo03/M5/Code/models/networks/classification/ScratchNet.py", line 12, in ScratchNet
+    self.url = 'http://datasets.cvc.uab.es/models/pytorch/basic_vgg16.pth'
+NameError: name 'self' is not defined

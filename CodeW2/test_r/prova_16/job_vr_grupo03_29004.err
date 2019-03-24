@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 85, in start
+    self.training_loop(epoch, train_loader, epoch_bar)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 129, in training_loop
+    self.outputs = self.model.net(inputs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/M5/Code/models/networks/classification/ResNet101.py", line 26, in forward
+    return self.model.forward(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/models/resnet.py", line 157, in forward
+    x = self.layer3(x)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/container.py", line 92, in forward
+    input = module(input)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/models/resnet.py", line 88, in forward
+    out = self.bn3(out)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/module.py", line 489, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/modules/batchnorm.py", line 76, in forward
+    exponential_average_factor, self.eps)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/nn/functional.py", line 1623, in batch_norm
+    training, momentum, eps, torch.backends.cudnn.enabled
+RuntimeError: CUDA out of memory. Tried to allocate 46.00 MiB (GPU 0; 10.92 GiB total capacity; 10.14 GiB already allocated; 29.50 MiB free; 89.51 MiB cached)

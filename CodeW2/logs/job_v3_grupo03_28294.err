@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 95, in start
+    self.validate_epoch(valid_set, valid_loader, early_Stopping, epoch, self.global_bar)
+  File "/home/grupo03/M5/Code/tasks/classification_manager.py", line 31, in validate_epoch
+    self.validator.start(valid_set, valid_loader, 'Epoch Validation', epoch, global_bar=global_bar)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 260, in start
+    self.save_stats(epoch)
+  File "/home/grupo03/M5/Code/tasks/classification_manager.py", line 124, in save_stats
+    self.writer.add_image('metrics/conf_matrix', conf_mat_img, epoch)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/tensorboardX/writer.py", line 427, in add_image
+    image(tag, img_tensor, dataformats=dataformats), global_step, walltime)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/tensorboardX/summary.py", line 216, in image
+    image = make_image(tensor, rescale=rescale)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/tensorboardX/summary.py", line 254, in make_image
+    image = Image.fromarray(tensor)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/PIL/Image.py", line 2517, in fromarray
+    raise TypeError("Cannot handle this data type")
+TypeError: Cannot handle this data type

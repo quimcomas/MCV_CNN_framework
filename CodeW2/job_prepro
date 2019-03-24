@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --array=1-6
+#SBATCH -n 4 # Number of cores
+#SBATCH --mem 16000 # 2GB solicitados.
+#SBATCH -p mhigh,mlow # or mlow Partition to submit to
+#SBATCH --gres gpu:1 # Para pedir Pascales MAX 8
+#SBATCH -o test_preprocessing/prova_%a/%x_%u_%j.out # File to which STDOUT will be written
+#SBATCH -e test_preprocessing/prova_%a/%x_%u_%j.err # File to which STDERR will be written
+
+python2 main.py --exp_name prova_${SLURM_ARRAY_TASK_ID} --exp_folder test_preprocessing --config_file config/config_preprocessing/classification_sample_vgg16_tt100k_${SLURM_ARRAY_TASK_ID}.yml
+

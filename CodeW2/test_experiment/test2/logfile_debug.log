@@ -1,0 +1,139 @@
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4025s 
+- Starting validation <---	 Validation step finished: 2s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 210s 
+- Experiment finished: 4273s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4093s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 27s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 206s 
+- Experiment finished: 4339s 
+	 Train step finished: 4030s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 210s 
+- Experiment finished: 4279s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4026s 
+- Starting validation <---	 Validation step finished: 2s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 186s 
+- Experiment finished: 4252s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4016s 
+- Starting validation <---	 Validation step finished: 2s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 24s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 203s 
+- Experiment finished: 4259s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 3999s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 24s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 137s 
+- Experiment finished: 4173s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4029s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Experiment finished: 4067s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 4042s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 169s 
+- Experiment finished: 4250s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 	 Train step finished: 319s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 26s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 156s 
+- Experiment finished: 515s 
+	 Train step finished: 4038s 
+- Starting validation <---	 Validation step finished: 3s 
+- Reading Test dataset: 
+ - Starting test <---	 Test step finished: 25s 
+- Reading Prediction dataset: 
+ - Generating predictions <---	 Prediction step finished: 175s 
+- Experiment finished: 4254s 
+
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+ ---------- Init experiment: test2 ---------- 
+- Building model: VGG16 <--- 
+- Reading Train dataset: 
+- Reading Validation dataset: 

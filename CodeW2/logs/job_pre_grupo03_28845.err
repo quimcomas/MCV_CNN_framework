@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 49, in main
+    dataloader.loader_set, dataloader.loader)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 85, in start
+    self.training_loop(epoch, train_loader, epoch_bar)
+  File "/home/grupo03/M5/Code/tasks/simple_trainer_manager.py", line 118, in training_loop
+    for i, data in enumerate(train_loader):
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 637, in __next__
+    return self._process_next_batch(batch)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 658, in _process_next_batch
+    raise batch.exc_type(batch.exc_msg)
+TypeError: Traceback (most recent call last):
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torch/utils/data/dataloader.py", line 138, in _worker_loop
+    samples = collate_fn([dataset[i] for i in batch_indices])
+  File "/home/grupo03/M5/Code/dataloader/fromFileDatasetClassification.py", line 51, in __getitem__
+    img = self.preprocess(img)
+  File "/home/grupo03/.local/lib/python2.7/site-packages/torchvision/transforms/transforms.py", line 60, in __call__
+    img = t(img)
+  File "/home/grupo03/M5/Code/utils/transformations/input_preprocess.py", line 45, in __call__
+    image = self.rescale(image)
+  File "/home/grupo03/M5/Code/utils/transformations/input_preprocess.py", line 9, in __call__
+    return image * self.rescale
+TypeError: ufunc 'multiply' did not contain a loop with signature matching types dtype('S6') dtype('S6') dtype('S6')
+

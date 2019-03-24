@@ -1,0 +1,22 @@
+Loading configuration ...
+	 Images from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_train_images.txt
+	 gt from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_train_gt.txt
+{'pl120': 0, 'w57': 1, 'io': 2, 'w55': 3, 'pl100': 4, 'ip': 5, 'w59': 6, 'w13': 7, 'pl5': 8, 'pl80': 9, 'p27': 10, 'p26': 11, 'p23': 12, 'ph5': 13, 'ph4': 14, 'i1': 15, 'pl20': 16, 'il100': 17, 'pl60': 18, 'pl40': 19, 'pg': 20, 'pm20': 21, 'pn': 22, 'po': 23, 'pr40': 24, 'il80': 25, 'p3': 26, 'wo': 27, 'pl50': 28, 'i5': 29, 'i4': 30, 'p10': 31, 'p11': 32, 'p12': 33, 'p19': 34, 'pne': 35, 'ph4.5': 36, 'pl30': 37, 'p6': 38, 'p5': 39, 'il60': 40, 'w32': 41, 'pm55': 42, 'pm30': 43, 'pl70': 44}
+	 Images found: 15196
+	 Images from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_valid_images.txt
+	 gt from: /home/mcv/datasets/M5/classification/TT100K_trafficSigns/TT100K_trafficSigns_valid_gt.txt
+{'pl120': 0, 'w57': 1, 'io': 2, 'w55': 3, 'pl100': 4, 'ip': 5, 'w59': 6, 'w13': 7, 'pl5': 8, 'pl80': 9, 'p27': 10, 'p26': 11, 'p23': 12, 'ph5': 13, 'ph4': 14, 'i1': 15, 'pl20': 16, 'il100': 17, 'pl60': 18, 'pl40': 19, 'pg': 20, 'pm20': 21, 'pn': 22, 'po': 23, 'pr40': 24, 'il80': 25, 'p3': 26, 'wo': 27, 'pl50': 28, 'i5': 29, 'i4': 30, 'p10': 31, 'p11': 32, 'p12': 33, 'p19': 34, 'pne': 35, 'ph4.5': 36, 'pl30': 37, 'p6': 38, 'p5': 39, 'il60': 40, 'w32': 41, 'pm55': 42, 'pm30': 43, 'pl70': 44}
+	 Images found: 740
+
+Total estimated tra
+ining time...
+[                  
+  ], 0.463 it/s, 0.
+
+
+Epoch 1/25 estimate
+d time...
+[                  
+  ], 0.927 it/s, 0.
+
+

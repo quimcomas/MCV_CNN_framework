@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 43, in main
+    dataloader.build_train()
+  File "/home/grupo03/M5/Code/dataloader/dataloader_builder.py", line 38, in build_train
+    preprocess=self.img_preprocessing, transform=self.train_transformation)
+  File "/home/grupo03/M5/Code/dataloader/fromFileDatasetSegmentation.py", line 17, in __init__
+    with open(image_txt) as f:
+IOError: [Errno 2] No such file or directory: '/datatmp/Datasets/segmentation/cityscapes/train_images.txt'

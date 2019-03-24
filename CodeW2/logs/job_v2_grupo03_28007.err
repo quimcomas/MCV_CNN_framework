@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "main.py", line 98, in <module>
+    main()
+  File "main.py", line 43, in main
+    dataloader.build_train()
+  File "/home/grupo03/M5/Code/dataloader/dataloader_builder.py", line 42, in build_train
+    preprocess=self.img_preprocessing, transform=self.train_transformation)
+  File "/home/grupo03/M5/Code/dataloader/fromFileDatasetClassification.py", line 31, in __init__
+    self.gt = [int(cf.map_labels[line]) for line in lines]
+KeyError: 'i1'
