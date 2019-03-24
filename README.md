@@ -31,5 +31,23 @@ Google slides link [here](https://docs.google.com/presentation/d/1Go_nup-Z3y36y8
 
 ### Week 3/4
 
+The goal of the weeks 3 and 4 is to segment each object of the scene giving its associated label. To evaluate and perform our image semantic segmentation we used different datasets:
+
+- Camvid
+- Kitti
+- Cityscapes
+- Synthia 
+- Pascal 12
+
+Tasks done during these weeks:
+
+- [x] Run the provided code (analize the dataset and evaluate on train, validation and test set). 
+- [x] Read two papers and summarize them (Long et al. CVPR, 2015 and O. Ronneberger, P. Fischer, and T. Brox). 
+- [x] Implement a new network using an existing implementation (Unet implementation).
+- [x] Implement a new network using our own implementation (FastNet).
+- [x] Train our networks for another dataset (we used all the datasets available).
+- [x] Boost the performance of our network (we boosted the performance of our own implementation and Unet).
+
+ 
 #### Summaries
 - [Unet](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/Unet.md)
