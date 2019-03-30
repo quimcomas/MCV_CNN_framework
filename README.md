@@ -29,7 +29,7 @@ The goal of this week 2 is to learn to classify images using state of the art ne
 - Tsinghua-Tencent 100K (TT100K)
 - Kitti 
 
-Tasks done during these weeks:
+Tasks done during this week:
 
 - [x] Run the provided code (analize the dataset and evaluate on train, validation and test set). 
 - [x] Read two papers and summarize them (VGG and SqueezeNet). 
