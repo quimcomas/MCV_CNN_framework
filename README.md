@@ -73,4 +73,5 @@ Tasks done during these weeks:
 Tasks done during these weeks:
 
 #### Summaries
+- [Faster R-CNN](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/Faster%20R-CNN.md)
 
