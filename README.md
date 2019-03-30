@@ -67,3 +67,10 @@ Tasks done during these weeks:
 - [FCN](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/FCN.md)
 - [Unet](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/Unet.md)
 
+### Week 5/6
+
+
+Tasks done during these weeks:
+
+#### Summaries
+
