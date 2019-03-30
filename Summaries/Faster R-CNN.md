@@ -1,5 +1,7 @@
 ## Faster R-CNN 
 
+[link to the paper](https://arxiv.org/pdf/1506.01497.pdf)
+
 The proposed network on this paper consist on a faster version of the R-CNN which reduces the computational time of object detection networks, called Faster R-CNN. 
 
 The Faster R-CNN consist on two modules or networks. Basically, it is composed by a region proposal network (RPN) for generating region proposals and another network, Fast R-CNN, which use these region proposals to detect objects.
