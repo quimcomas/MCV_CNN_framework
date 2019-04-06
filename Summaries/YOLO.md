@@ -2,9 +2,9 @@
 
 [link to the paper](https://arxiv.org/pdf/1506.02640.pdf)
 
-YOLO (You Only Look Once) is an object detection system based on a single convolutial network that simultaneusly predicts multiple bounding boxes and class probabilities for those boxes. The aim of YOLO is to create a structure capable to be faster than Faster R-CNN to achieve the real-time object detection.
+You Only Look Once (YOLO) is an object detection system based on a single convolutial network that simultaneusly predicts multiple bounding boxes and class probabilities for those boxes. The aim of YOLO is to create a structure capable to be faster than Faster R-CNN to achieve the real-time object detection.
 
-Yolo has reframed object detection as a single regression problem, straight from image pixels to bounding box coordinates and class probabilities. This unified model improves traditional methods in terms of speed due to its simple pipeline.
+YOLO has reframed object detection as a single regression problem, straight from image pixels to bounding box coordinates and class probabilities. This unified model improves traditional methods in terms of speed due to its simple pipeline.
 Instead of sliding windows and region proposal-based techniques, YOLO trains and test on full images so it implicitly encodes contextual information about classes as well as their appearance so it directly optimizes detection performance.
 
 YOLO system divides the input image into an SxS grid. The grid cell responsible for detecting an object is the one in which the center of the object falls into. Each grid cell predicts 2 bounding boxes and confidence scores for those boxes and class probabilities for those bounding boxes. The system only predicts one set of class probabilities per grid cell.
