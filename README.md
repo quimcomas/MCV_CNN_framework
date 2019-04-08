@@ -72,6 +72,13 @@ Tasks done during these weeks:
 
 Tasks done during these weeks:
 
+- [x] Train an existing object detection network (Keras-FRCNN from https://github.com/jinfagang/keras_frcnn using kitti dataset)
+- [x] Analyse all datasets and provide some metric such as mAP and FPS 
+- [x] Read two papers (FRCNN + YOLO)
+- [x] Train the network for another dataset (in our case we use TT100K and Udacity)
+- [x] Boost the performance of your network 
+- [x] Report showing the achieved results 
+
 #### Summaries
 - [Faster R-CNN](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/Faster%20R-CNN.md)
 - [YOLO](https://github.com/quimcomas/MCV_CNN_framework/blob/master/Summaries/YOLO.md)
